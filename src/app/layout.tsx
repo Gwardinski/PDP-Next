@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { getServerSession } from "next-auth";
 import SessionProvider from "../components/SessionProvider";
 
 import { AuthButton } from "../components/AuthButton";
-import { NavMenu, NextAuthRoutes } from "../components/NavMenu";
+import { AppRoute, Navigation } from "@/components/Navigation";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,11 +20,13 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body>
+      <body className="bg-gradient-to-b from-neutral-900 to-neutral-800 h-screen w-screen">
         <SessionProvider session={session}>
           <main className="px-4 lg:px-16">
-            <AuthButton />
-            <NavMenu routes={NextAuthRoutes} />
+            <div className="flex w-full justify-between">
+              <Navigation routes={AppRoutes} />
+              <AuthButton />
+            </div>
             {children}
           </main>
         </SessionProvider>
@@ -33,3 +34,18 @@ export default async function RootLayout({
     </html>
   );
 }
+
+const AppRoutes: AppRoute[] = [
+  {
+    path: "/",
+    name: "Home",
+  },
+  {
+    path: "/auth",
+    name: "NextAuth with SSR",
+  },
+  {
+    path: "/links",
+    name: "Form Requests with SSR",
+  },
+];

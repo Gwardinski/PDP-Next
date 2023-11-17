@@ -7,13 +7,19 @@ export const AuthButton: React.FC = () => {
 
   if (session) {
     return (
-      <button className="h-10 bg-neutral-800 px-4" onClick={() => signOut()}>
+      <button
+        className="h-12 border rounded-sm border-neutral-500 text-lg min-w-fit px-4 text-white"
+        onClick={() => signOut()}
+      >
         Sign out
       </button>
     );
   }
   return (
-    <button className="h-10 bg-neutral-800 px-4" onClick={() => signIn()}>
+    <button
+      className="h-12 border rounded-sm border-neutral-500 text-lg min-w-fit px-4 text-white"
+      onClick={() => signIn()}
+    >
       Sign in
     </button>
   );
