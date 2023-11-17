@@ -1,0 +1,27 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1700258250459,
+      "tag": "0000_lush_darwin",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1700258627462,
+      "tag": "0001_nebulous_proemial_gods",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1700258834925,
+      "tag": "0002_handy_tana_nile",
+      "breakpoints": true
+    }
+  ]
+}
