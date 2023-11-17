@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { getServerSession } from "next-auth";
-import SessionProvider from "./components/SessionProvider";
+import SessionProvider from "../components/SessionProvider";
 
-import { AuthButton } from "./components/AuthButton";
-import { NavMenu, NextAuthRoutes } from "./components/NavMenu";
+import { AuthButton } from "../components/AuthButton";
+import { NavMenu, NextAuthRoutes } from "../components/NavMenu";
 
 export const metadata: Metadata = {
   title: "Create Next App",

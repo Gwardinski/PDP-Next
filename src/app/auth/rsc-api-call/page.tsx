@@ -3,7 +3,7 @@ import {
   DescriptionContainer,
   PageLayout,
   PageTitle,
-} from "@/app/components/page-layout";
+} from "@/components/page-layout";
 import { headers } from "next/headers";
 
 export default async function RSCAPICallPage() {

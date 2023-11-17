@@ -49,23 +49,23 @@ type Route = {
 
 export const NextAuthRoutes: Route[] = [
   {
-    path: "/nextauth/rsc",
+    path: "/auth/rsc",
     name: "RSC",
   },
   {
-    path: "/nextauth/rsc-protected",
+    path: "/auth/rsc-protected",
     name: "RSC - Protected",
   },
   {
-    path: "/nextauth/rsc-server-action",
+    path: "/auth/rsc-server-action",
     name: "RSC - Server Action",
   },
   {
-    path: "/nextauth/rsc-api-call",
+    path: "/auth/rsc-api-call",
     name: "RSC - API Call",
   },
   {
-    path: "/nextauth/client-api-call",
+    path: "/auth/client-api-call",
     name: "Client API Call",
   },
 ];

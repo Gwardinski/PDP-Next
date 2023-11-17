@@ -5,7 +5,7 @@ import {
   DescriptionContainer,
   PageLayout,
   PageTitle,
-} from "@/app/components/page-layout";
+} from "@/components/page-layout";
 
 export default async function RSCProtectedPage() {
   const session = await getServerSession();

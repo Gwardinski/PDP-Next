@@ -5,7 +5,7 @@ import {
   DescriptionContainer,
   PageLayout,
   PageTitle,
-} from "@/app/components/page-layout";
+} from "@/components/page-layout";
 import { useState, useEffect } from "react";
 
 export default function ClientAPICallPage() {

@@ -3,7 +3,7 @@ import {
   DescriptionContainer,
   PageLayout,
   PageTitle,
-} from "@/app/components/page-layout";
+} from "@/components/page-layout";
 import { getServerSession } from "next-auth";
 
 export default async function RSCPage() {

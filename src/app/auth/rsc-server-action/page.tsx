@@ -6,7 +6,7 @@ import {
   DescriptionContainer,
   PageLayout,
   PageTitle,
-} from "@/app/components/page-layout";
+} from "@/components/page-layout";
 
 export default async function RSCServerActionPage() {
   const whoAmI = async (): Promise<string> => {
