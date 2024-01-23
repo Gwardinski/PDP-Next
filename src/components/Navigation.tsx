@@ -12,7 +12,7 @@ export type AppRoute = {
 
 export const Navigation: React.FC<{ routes: AppRoute[] }> = ({ routes }) => {
   return (
-    <ul className="border-b w-fit border-neutral-700 flex h-12 items-center">
+    <ul className="border-b w-fit border-zinc-300 dark:border-zinc-700 flex h-12 items-center">
       {routes.map(({ path, name }) => (
         <NavigationLink key={path} path={path} name={name} />
       ))}

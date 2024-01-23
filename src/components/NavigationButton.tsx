@@ -18,8 +18,8 @@ export const NavigationLink: React.FC<{ path: string; name: string }> = ({
       <li
         className={
           active
-            ? "h-12 flex justify-center items-center text-neutral-200 px-4 text-lg bg-neutral-700"
-            : "h-12 flex justify-center items-center text-neutral-200 px-4 text-lg"
+            ? "h-12 flex justify-center items-center font-bold text-back dark:text-zinc-200 px-4 text-lg border-b border-b-orange-500"
+            : "h-12 flex justify-center items-center font-bold text-back dark:text-zinc-200 px-4 text-lg"
         }
       >
         {name}

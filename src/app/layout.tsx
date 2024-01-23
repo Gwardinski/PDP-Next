@@ -5,6 +5,8 @@ import SessionProvider from "../components/SessionProvider";
 
 import { AuthButton } from "../components/AuthButton";
 import { AppRoute, Navigation } from "@/components/Navigation";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -20,17 +22,25 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className="bg-gradient-to-b from-neutral-900 to-neutral-800 h-screen w-screen">
-        <SessionProvider session={session}>
-          <main className="px-4 lg:px-16">
-            <div className="flex w-full justify-between">
+      <SessionProvider session={session}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <body className="bg-gradient-to-b from-zinc-100 to-zinc-200 dark:to-zinc-950 dark:from-zinc-900 h-screen w-screen">
+            <header className="flex w-full justify-between items-center gap-2">
               <Navigation routes={AppRoutes} />
-              <AuthButton />
-            </div>
-            {children}
-          </main>
-        </SessionProvider>
-      </body>
+              <div className="flex gap-2">
+                <AuthButton />
+                <ThemeToggle />
+              </div>
+            </header>
+            <main className="px-4 lg:px-16">{children}</main>
+          </body>
+        </ThemeProvider>
+      </SessionProvider>
     </html>
   );
 }
@@ -47,5 +57,9 @@ const AppRoutes: AppRoute[] = [
   {
     path: "/links",
     name: "Form Requests with SSR",
+  },
+  {
+    path: "/quiz",
+    name: "Quiz 'Trello' Board",
   },
 ];

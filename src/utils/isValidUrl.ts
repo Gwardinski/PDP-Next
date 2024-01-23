@@ -1,10 +1,10 @@
 export default async function isValidURL(
   url: string,
-  disallowedDomains: string[]
+  disallowedDomains: string[],
 ) {
   // Construct a regular expression pattern to match disallowed domains
   const disallowedPattern = `^https?:\\/\\/(?:${disallowedDomains.join(
-    "|"
+    "|",
   )})\\b`;
   let disallowedRegex = new RegExp(disallowedPattern, "i");
 
