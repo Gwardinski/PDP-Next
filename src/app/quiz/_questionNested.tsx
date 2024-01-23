@@ -37,11 +37,13 @@ export const QuestionNested: React.FC<{
 
   return (
     <AccordionItem
-      value={`question-${question.id}`}
+      value={`QUESTION-${question.id}`}
       ref={setNodeRef}
       style={style}
     >
-      <AccordionTrigger className="flex w-full rounded-md p-2">
+      <AccordionTrigger
+        className={`flex w-full rounded-md p-2 ${isDragging && "opacity-40"}`}
+      >
         <div className="flex w-full flex-col items-start justify-start">
           <p className="text-sm text-zinc-700 dark:text-zinc-300">
             Question {index + 1}
