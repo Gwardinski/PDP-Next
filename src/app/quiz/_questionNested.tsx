@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import {
+  Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
@@ -16,7 +17,6 @@ export const QuestionNested: React.FC<{
   index: number;
   onDeleteQuestion: (qid: UniqueIdentifier, rid: UniqueIdentifier) => void;
 }> = ({ question, index, onDeleteQuestion }) => {
-  const [showAnswer, setShowAnswer] = useState(false);
   const {
     setNodeRef,
     attributes,
@@ -38,27 +38,28 @@ export const QuestionNested: React.FC<{
   };
 
   return (
-    <div
+    <AccordionItem
+      value={question.id.toString()}
       ref={setNodeRef}
       style={style}
-      className={`flex min-h-[80px] w-full rounded-md px-2 py-2 ${
-        isDragging && "opacity-40"
-      }`}
-      {...attributes}
+      className={`flex w-full rounded-md p-2 ${isDragging && "opacity-40"}`}
     >
-      <button
-        onClick={() => setShowAnswer((v) => !v)}
-        className="flex h-full w-full flex-col items-start"
-      >
-        <p className="text-sm text-zinc-700 dark:text-zinc-300">
+      <AccordionTrigger className="flex min-h-[80px] w-full flex-col items-start gap-1 p-0">
+        <p className="text-sm text-zinc-700 dark:text-zinc-400">
           Question {index + 1}
         </p>
-        <p className={`${showAnswer && "text-orange-500"}`}>
-          {showAnswer ? question.answer : question.title}
+
+        <p>{question.title}</p>
+
+        <AccordionContent>
+          <p className="text-orange-600">{question.answer}</p>
+        </AccordionContent>
+
+        <p className="text-sm text-zinc-700 dark:text-zinc-400">
+          {question.points} Points
         </p>
-        <p>{question.points} Points</p>
-      </button>
-      <div className="flex items-center justify-center gap-2">
+      </AccordionTrigger>
+      <div className="ml-auto flex items-center justify-center gap-2">
         <Button
           variant="ghost"
           size="icon"
@@ -66,9 +67,9 @@ export const QuestionNested: React.FC<{
         >
           <XCircle className="text-red-500 dark:text-red-700" />
         </Button>
-        <GripVertical {...listeners} />
+        <GripVertical {...attributes} {...listeners} />
       </div>
-    </div>
+    </AccordionItem>
   );
 };
 

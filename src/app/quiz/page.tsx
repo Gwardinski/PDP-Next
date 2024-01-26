@@ -21,7 +21,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Accordion } from "@/components/ui/accordion";
 import { CreateRoundModal, RoundCreate } from "./_createRound";
 import { RoundNested } from "./_roundNested";
@@ -210,43 +210,45 @@ export default function QuizPage() {
         </Link>
       </PageHeader>
 
-      <div className="flex max-w-xl flex-col gap-8">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCorners}
-          onDragStart={onDragStart}
-          onDragOver={onDragOver}
-          onDragEnd={onDragEnd}
-        >
-          <SortableContext
-            items={rounds.map((r) => r.id)}
-            strategy={verticalListSortingStrategy}
+      <div className="">
+        <div className="flex h-full max-w-xl flex-col gap-8 rounded-md bg-zinc-300 p-4">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCorners}
+            onDragStart={onDragStart}
+            onDragOver={onDragOver}
+            onDragEnd={onDragEnd}
           >
-            <Accordion type="multiple" className="flex flex-col gap-4">
-              {rounds.map((r, i) => {
-                return (
-                  <RoundNested
-                    key={`${r.id}-${i}`}
-                    round={r}
-                    questions={questions.filter((q) => q.rid === r.id)}
-                    index={i}
-                    onDeleteRound={onDeleteRound}
-                    onCreateQuestion={onCreateQuestion}
-                    onDeleteQuestion={onDeleteQuestion}
-                  />
-                );
-              })}
-            </Accordion>
-          </SortableContext>
-          <DragOverlay>
-            {activeQuestion && (
-              <QuestionDragOverlay question={activeQuestion} />
-            )}
-            {activeRound && <div className="h-20 w-full bg-zinc-600" />}
-          </DragOverlay>
-        </DndContext>
+            <SortableContext
+              items={rounds.map((r) => r.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <Accordion type="multiple" className="flex flex-col gap-4">
+                {rounds.map((r, i) => {
+                  return (
+                    <RoundNested
+                      key={`${r.id}-${i}`}
+                      round={r}
+                      questions={questions.filter((q) => q.rid === r.id)}
+                      index={i}
+                      onDeleteRound={onDeleteRound}
+                      onCreateQuestion={onCreateQuestion}
+                      onDeleteQuestion={onDeleteQuestion}
+                    />
+                  );
+                })}
+              </Accordion>
+            </SortableContext>
+            <DragOverlay>
+              {activeQuestion && (
+                <QuestionDragOverlay question={activeQuestion} />
+              )}
+              {activeRound && <div className="h-20 w-full bg-zinc-600" />}
+            </DragOverlay>
+          </DndContext>
 
-        <CreateRoundModal onCreateRound={onCreateRound} />
+          <CreateRoundModal onCreateRound={onCreateRound} />
+        </div>
       </div>
     </PageLayout>
   );

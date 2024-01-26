@@ -62,17 +62,17 @@ export const RoundNested: React.FC<{
       value={`ROUND-${round.id}`}
       ref={setNodeRef}
       style={style}
-      className={`flex max-w-xl flex-col rounded-md bg-zinc-300 dark:bg-zinc-800 ${
+      className={`flex max-w-xl flex-col rounded-md bg-zinc-100 dark:bg-zinc-800 ${
         isDragging && "opacity-40"
       }`}
     >
-      <AccordionTrigger className="flex h-20 items-center gap-2 rounded-t-md bg-zinc-400 p-2 dark:bg-zinc-700">
+      <AccordionTrigger className="flex h-20 items-center gap-2 rounded-t-md bg-white p-2 dark:bg-zinc-700">
         <div className="flex w-full flex-col items-start justify-start">
           <h4 className="flex gap-4 text-sm text-orange-500 dark:text-orange-600">
             Round {index + 1}
           </h4>
           <h2 className="text-lg">{round.title}</h2>
-          <h4 className="flex gap-4 text-sm text-zinc-700 dark:text-zinc-300">
+          <h4 className="flex gap-4 text-sm text-zinc-200 dark:text-zinc-300">
             {questions.length} Questions {totalPoints} Points
           </h4>
         </div>

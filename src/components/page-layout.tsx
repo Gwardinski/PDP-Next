@@ -1,7 +1,7 @@
 import { HTMLAttributes } from "react";
 
 export const PageLayout: React.FC<HTMLAttributes<HTMLDivElement>> = (props) => (
-  <section className="flex flex-col gap-4 pt-4 h-full" {...props} />
+  <section className="flex h-full flex-col gap-4 pt-4" {...props} />
 );
 
 export const PageHeader: React.FC<HTMLAttributes<HTMLHeadingElement>> = (
@@ -19,13 +19,13 @@ export const PageTitle: React.FC<HTMLAttributes<HTMLHeadingElement>> = (
 
 export const DescriptionContainer: React.FC<HTMLAttributes<HTMLDivElement>> = (
   props,
-) => <div className="flex flex-col h-32 w-full gap-2" {...props} />;
+) => <div className="flex h-32 w-full flex-col gap-2" {...props} />;
 
 export const DataContainer: React.FC<HTMLAttributes<HTMLDivElement>> = (
   props,
 ) => (
   <div
-    className="px-4 py-8 border h-32 border-zinc-500 justify-center items-center rounded-lg w-80"
+    className="h-32 w-80 items-center justify-center rounded-lg border border-zinc-500 px-4 py-8"
     {...props}
   />
 );
