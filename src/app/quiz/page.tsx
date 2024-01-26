@@ -5,7 +5,7 @@ import { PageLayout, PageHeader, PageTitle } from "@/components/page-layout";
 import {
   DndContext,
   DragEndEvent,
-  DragMoveEvent,
+  DragOverEvent,
   DragOverlay,
   DragStartEvent,
   KeyboardSensor,
@@ -19,6 +19,7 @@ import {
   SortableContext,
   arrayMove,
   sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useMemo, useState } from "react";
 import { Accordion } from "@/components/ui/accordion";
@@ -27,6 +28,7 @@ import { RoundNested } from "./_roundNested";
 import { QuestionCreate } from "./_createQuestion";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import { QuestionDragOverlay } from "./_questionNested";
 
 export type Round = {
   id: UniqueIdentifier;
@@ -43,9 +45,59 @@ export type Question = {
 
 export default function QuizPage() {
   const [rounds, setRounds] = useState<Round[]>(mockData);
-  const roundIds = useMemo(() => rounds.map((r) => r.id), [rounds]);
 
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const [questions, setQuestions] = useState<Question[]>(
+    mockData.flatMap((r) => r.questions),
+  );
+
+  const [activeQuestion, setActiveQuestion] = useState<Question | null>(null);
+  const [activeRound, setActiveRound] = useState<Round | null>(null);
+
+  // Mutate Handlers - Move into Context / Zustand
+  const onCreateRound = (values: RoundCreate) => {
+    const newRound: Round = {
+      id: `ROUND-${uuidv4()}`,
+      title: values.title,
+      questions: [],
+    };
+    setRounds([...rounds, newRound]);
+  };
+
+  const onDeleteRound = (rid: UniqueIdentifier) => {
+    setRounds(rounds.filter((r) => r.id !== rid));
+  };
+
+  const onCreateQuestion = (values: QuestionCreate, rid: UniqueIdentifier) => {
+    const newQuestion: Question = {
+      id: `QUESTION-${uuidv4()}`,
+      rid: rid,
+      title: values.title,
+      answer: values.answer,
+      points: values.points,
+    };
+    setRounds(
+      rounds.map((r) => {
+        if (r.id === rid) {
+          r.questions = [...r.questions, newQuestion];
+        }
+        return r;
+      }),
+    );
+  };
+
+  const onDeleteQuestion = (
+    questionId: UniqueIdentifier,
+    rid: UniqueIdentifier,
+  ) => {
+    setRounds(
+      rounds.map((r) => {
+        if (r.id === rid) {
+          r.questions = r.questions.filter((q) => q.id !== questionId);
+        }
+        return r;
+      }),
+    );
+  };
 
   // Dnd Handlers
   const sensors = useSensors(
@@ -59,245 +111,87 @@ export default function QuizPage() {
     }),
   );
 
-  // Dind round either by it's ID, or the ID of one of it's Questions
-  const getRoundById = (
-    id: UniqueIdentifier | undefined,
-    idType: "rid" | "qid",
-  ) => {
-    if (idType === "rid") {
-      return rounds.find((q) => q.id === id);
+  function onDragStart(event: DragStartEvent) {
+    if (event.active.data.current?.type === "ROUND") {
+      setActiveRound(event.active.data.current.round);
+      return;
     }
-    if (idType === "qid") {
-      return rounds.find((r) => r.questions.find((q) => q.id === id));
+
+    if (event.active.data.current?.type === "QUESTION") {
+      setActiveQuestion(event.active.data.current.question);
+      return;
     }
-  };
+  }
 
-  const onDragStart = (event: DragStartEvent) => {
-    const { active } = event;
-    setActiveId(active.id);
-  };
+  function onDragEnd(event: DragEndEvent) {
+    setActiveRound(null);
+    setActiveQuestion(null);
 
-  const onDragMove = (event: DragMoveEvent) => {
     const { active, over } = event;
-
     if (!over) return;
-    if (active.id === over.id) return;
 
-    // Question Sorting
-    if (
-      active.id.toString().includes("QUESTION") &&
-      over.id.toString().includes("QUESTION")
-    ) {
-      // Find active and over Round
-      const activeRound = getRoundById(active.id, "qid");
-      const overRound = getRoundById(over.id, "qid");
-      if (!activeRound || !overRound) return;
+    const activeId = active.id;
+    const overId = over.id;
 
-      // Find the index of the active and over Round
-      const activeRoundIndex = rounds.findIndex((r) => r.id === activeRound.id);
-      const overRoundIndex = rounds.findIndex((r) => r.id === overRound.id);
+    if (activeId === overId) return;
 
-      // Find the index of the active and over Question
-      const activeQuestionIndex = activeRound.questions.findIndex(
-        (question) => question.id === active.id,
-      );
-      const overQuestionIndex = overRound.questions.findIndex(
-        (question) => question.id === over.id,
-      );
+    const isActiveARound = active.data.current?.type === "ROUND";
+    if (!isActiveARound) return;
 
-      // In same Round
-      if (activeRoundIndex === overRoundIndex) {
-        let neQuestions = [...rounds];
-        neQuestions[activeRoundIndex].questions = arrayMove(
-          neQuestions[activeRoundIndex].questions,
-          activeQuestionIndex,
-          overQuestionIndex,
-        );
-        setRounds(neQuestions);
-      }
-    }
+    console.log("DRAG END");
 
-    // Handling Question Drop Into a Round
-    if (
-      active.id.toString().includes("QUESTION") &&
-      over?.id.toString().includes("ROUND")
-    ) {
-      // Find the active and over Round
-      const activeRound = getRoundById(active.id, "qid");
-      const overRound = getRoundById(over.id, "rid");
+    setRounds((rounds) => {
+      const activeRoundIndex = rounds.findIndex((r) => r.id === activeId);
 
-      // If the active or over Round is not found, return
-      if (!activeRound || !overRound) return;
+      const overRoundIndex = rounds.findIndex((r) => r.id === overId);
 
-      // Find the index of the active and over Round
-      const activeRoundIndex = rounds.findIndex((r) => r.id === activeRound.id);
-      const overRoundIndex = rounds.findIndex((r) => r.id === overRound.id);
+      return arrayMove(rounds, activeRoundIndex, overRoundIndex);
+    });
+  }
 
-      // Find the index of the active and over Question
-      const activeQuestionIndex = activeRound.questions.findIndex(
-        (q) => q.id === active.id,
-      );
-
-      // Remove the active Question from the active Round and add it to the over Round
-      let newQuestions = [...rounds];
-      const [removedQuestion] = newQuestions[activeRoundIndex].questions.splice(
-        activeQuestionIndex,
-        1,
-      );
-      newQuestions[overRoundIndex].questions.push(removedQuestion);
-      setRounds(newQuestions);
-    }
-  };
-
-  const onDragEnd = (event: DragEndEvent) => {
+  function onDragOver(event: DragOverEvent) {
     const { active, over } = event;
-
     if (!over) return;
-    if (active.id === over.id) return;
 
-    // Handling Round Sorting
-    if (
-      active.id.toString().includes("ROUND") &&
-      over?.id.toString().includes("ROUND")
-    ) {
-      // Find the index of the active and over Round
-      const activeRoundIndex = rounds.findIndex(
-        (round) => round.id === active.id,
-      );
-      const overRoundIndex = rounds.findIndex((round) => round.id === over.id);
-      // Swap the active and over Round
-      let newQuestions = [...rounds];
-      newQuestions = arrayMove(newQuestions, activeRoundIndex, overRoundIndex);
-      setRounds(newQuestions);
-    }
+    const activeId = active.id;
+    const overId = over.id;
 
-    // Handling Question Sorting
-    if (
-      active.id.toString().includes("QUESTION") &&
-      over?.id.toString().includes("QUESTION")
-    ) {
-      // Find the active and over round
-      const activeRound = getRoundById(active.id, "qid");
-      const overRound = getRoundById(over.id, "qid");
+    if (activeId === overId) return;
 
-      // If the active or over Round is not found, return
-      if (!activeRound || !overRound) return;
-      // Find the index of the active and over Round
-      const activeRoundIndex = rounds.findIndex(
-        (round) => round.id === activeRound.id,
-      );
-      const overRoundIndex = rounds.findIndex(
-        (round) => round.id === overRound.id,
-      );
-      // Find the index of the active and over Question
-      const activeQuestionIndex = activeRound.questions.findIndex(
-        (q) => q.id === active.id,
-      );
-      const overQuestionIndex = overRound.questions.findIndex(
-        (q) => q.id === over.id,
-      );
+    const isActiveAQuestion = active.data.current?.type === "QUESTION";
+    const isOverAQuestion = over.data.current?.type === "QUESTION";
 
-      // In the same Round
-      if (activeRoundIndex === overRoundIndex) {
-        let newQuestions = [...rounds];
-        newQuestions[activeRoundIndex].questions = arrayMove(
-          newQuestions[activeRoundIndex].questions,
-          activeQuestionIndex,
-          overQuestionIndex,
-        );
-        setRounds(newQuestions);
-      } else {
-        // In different Rounds
-        let newQuestions = [...rounds];
-        const [removedQuestion] = newQuestions[
-          activeRoundIndex
-        ].questions.splice(activeQuestionIndex, 1);
-        newQuestions[overRoundIndex].questions.splice(
-          overQuestionIndex,
-          0,
-          removedQuestion,
-        );
-        setRounds(newQuestions);
-      }
-    }
-    // Handling Question dropping into Round
-    if (
-      active.id.toString().includes("QUESTION") &&
-      over?.id.toString().includes("ROUND")
-    ) {
-      // Find the active and over Round
-      const activeRound = getRoundById(active.id, "qid");
-      const overRound = getRoundById(over.id, "rid");
+    if (!isActiveAQuestion) return;
 
-      // If the active or over Round is not found, return
-      if (!activeRound || !overRound) return;
-      // Find the index of the active and over Round
-      const activeRoundIndex = rounds.findIndex((r) => r.id === activeRound.id);
-      const overRoundIndex = rounds.findIndex((q) => q.id === overRound.id);
-      // Find the index of the active and over Question
-      const activeQuestionIndex = activeRound.questions.findIndex(
-        (q) => q.id === active.id,
-      );
+    // Im dropping a Question over another Question
+    if (isActiveAQuestion && isOverAQuestion) {
+      setQuestions((questions) => {
+        const activeIndex = questions.findIndex((q) => q.id === activeId);
+        const overIndex = questions.findIndex((q) => q.id === overId);
 
-      let newQuestions = [...rounds];
-      const [removedQuestion] = newQuestions[activeRoundIndex].questions.splice(
-        activeQuestionIndex,
-        1,
-      );
-      newQuestions[overRoundIndex].questions.push(removedQuestion);
-      setRounds(newQuestions);
-    }
-    setActiveId(null);
-  };
-
-  // Mutate Handlers - Move into Context / Zustand
-  const onCreateRound = (values: RoundCreate) => {
-    const newRound: Round = {
-      id: `ROUND-${uuidv4()}`,
-      title: values.title,
-      questions: [],
-    };
-    setRounds([...rounds, newRound]);
-  };
-
-  const onDeleteRound = (roundId: UniqueIdentifier) => {
-    setRounds(rounds.filter((r) => r.id !== roundId));
-  };
-
-  const onCreateQuestion = (
-    values: QuestionCreate,
-    roundId: UniqueIdentifier,
-  ) => {
-    const newQuestion: Question = {
-      id: `QUESTION-${uuidv4()}`,
-      rid: roundId,
-      title: values.title,
-      answer: values.answer,
-      points: values.points,
-    };
-    setRounds(
-      rounds.map((r) => {
-        if (r.id === roundId) {
-          r.questions = [...r.questions, newQuestion];
+        if (questions[activeIndex].rid != questions[overIndex].rid) {
+          // Fix introduced after video recording
+          questions[activeIndex].rid = questions[overIndex].rid;
+          return arrayMove(questions, activeIndex, overIndex - 1);
         }
-        return r;
-      }),
-    );
-  };
 
-  const onDeleteQuestion = (
-    questionId: UniqueIdentifier,
-    roundId: UniqueIdentifier,
-  ) => {
-    setRounds(
-      rounds.map((r) => {
-        if (r.id === roundId) {
-          r.questions = r.questions.filter((q) => q.id !== questionId);
-        }
-        return r;
-      }),
-    );
-  };
+        return arrayMove(questions, activeIndex, overIndex);
+      });
+    }
+
+    const isOverARound = over.data.current?.type === "ROUND";
+
+    // Im dropping a Question over a round
+    if (isActiveAQuestion && isOverARound) {
+      setQuestions((questions) => {
+        const activeIndex = questions.findIndex((t) => t.id === activeId);
+
+        questions[activeIndex].rid = overId;
+
+        return arrayMove(questions, activeIndex, activeIndex);
+      });
+    }
+  }
 
   return (
     <PageLayout>
@@ -310,7 +204,7 @@ export default function QuizPage() {
         </p>
         <Link
           href="https://dndkit.com/"
-          className="flex items-center gap-2 hover:underline"
+          className="questions-center flex gap-2 hover:underline"
         >
           <ExternalLink /> Documentation
         </Link>
@@ -321,16 +215,20 @@ export default function QuizPage() {
           sensors={sensors}
           collisionDetection={closestCorners}
           onDragStart={onDragStart}
-          onDragMove={onDragMove}
+          onDragOver={onDragOver}
           onDragEnd={onDragEnd}
         >
-          <SortableContext items={roundIds}>
+          <SortableContext
+            items={rounds.map((r) => r.id)}
+            strategy={verticalListSortingStrategy}
+          >
             <Accordion type="multiple" className="flex flex-col gap-4">
               {rounds.map((r, i) => {
                 return (
                   <RoundNested
                     key={`${r.id}-${i}`}
                     round={r}
+                    questions={questions.filter((q) => q.rid === r.id)}
                     index={i}
                     onDeleteRound={onDeleteRound}
                     onCreateQuestion={onCreateQuestion}
@@ -340,14 +238,11 @@ export default function QuizPage() {
               })}
             </Accordion>
           </SortableContext>
-          <DragOverlay adjustScale={false}>
-            {activeId && activeId.toString().includes("QUESTION") && (
-              <div className="h-20 w-full bg-zinc-600" />
+          <DragOverlay>
+            {activeQuestion && (
+              <QuestionDragOverlay question={activeQuestion} />
             )}
-            {/* Drag Overlay For Container */}
-            {activeId && activeId.toString().includes("ROUND") && (
-              <div className="h-20 w-full bg-zinc-600" />
-            )}
+            {activeRound && <div className="h-20 w-full bg-zinc-600" />}
           </DragOverlay>
         </DndContext>
 
