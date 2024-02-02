@@ -3,7 +3,7 @@ import {
   VideoLink,
   GithubLink,
   FunctionalText,
-  BrokenText,
+  BugText,
 } from "@/components/DocText";
 import { AppRoute } from "@/components/Navigation";
 import { NavigationSub } from "@/components/NavigationSub";
@@ -50,7 +50,7 @@ export default function AuthLayout({
                   href="https://github.com/Gwardinski/PDP/tree/main/src/app/auth"
                 />
                 <FunctionalText text="Each route gets user data" />
-                <BrokenText text="'RSC - Server Action' current goosed on Prod. Only works locally" />
+                <BugText text="'RSC - Server Action' current goosed on Prod. Only works locally" />
               </AccordionContent>
             </AccordionItem>
           </Accordion>

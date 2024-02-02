@@ -6,6 +6,8 @@ import {
   Wrench,
   CircleOff,
   RefreshCw,
+  Bug,
+  ListTodo,
 } from "lucide-react";
 import Link from "next/link";
 import { HTMLAttributes } from "react";
@@ -62,11 +64,11 @@ export const NonFunctionalText: React.FC<{
   </div>
 );
 
-export const BrokenText: React.FC<{
+export const BugText: React.FC<{
   text: string;
 }> = ({ text }) => (
   <div className="text-md flex w-fit items-center justify-center gap-4 font-bold">
-    <CircleOff className="text-red-600 dark:text-red-500" /> {text}
+    <Bug className="text-red-600 dark:text-red-500" /> {text}
   </div>
 );
 
@@ -75,6 +77,16 @@ export const RefreshText: React.FC<{
 }> = ({ text }) => (
   <div className="text-md flex w-fit items-center justify-center gap-4">
     <RefreshCw /> {text}
+  </div>
+);
+
+export const TodoText: React.FC<{
+  text: string;
+}> = ({ text }) => (
+  <div className="text-md flex w-fit items-center justify-center gap-4">
+    <ListTodo className="text-yellow-600 dark:text-yellow-500" />{" "}
+    <b className="-mr-2">TODO:</b>
+    {text}
   </div>
 );
 

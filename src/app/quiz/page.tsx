@@ -60,6 +60,8 @@ import {
   FunctionalText,
   NonFunctionalText,
   RefreshText,
+  BugText,
+  TodoText,
 } from "@/components/DocText";
 
 export type Round = {
@@ -336,6 +338,12 @@ export default function QuizPage() {
                 <NonFunctionalText
                   text="Menu functionality - edit, publish delete is non-functional and just for example
                   purposes"
+                />
+                <BugText text="Delete button doesn't work on neither Question or Round" />
+                <TodoText text="Move state into Zustand to prevent Prop Drilling" />
+                <DocumentationLink
+                  href="https://www.npmjs.com/package/zustand#typescript-usage"
+                  text="Zustand Docs"
                 />
                 <RefreshText text="Refresh page to reset data" />
               </AccordionContent>
