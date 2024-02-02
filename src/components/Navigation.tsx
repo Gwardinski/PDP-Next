@@ -80,7 +80,7 @@ const appRoutes: AppRoute[] = [
   },
   {
     path: "/auth",
-    name: "SSR NextAuth",
+    name: "NextAuth SSR",
   },
   {
     path: "/quiz",

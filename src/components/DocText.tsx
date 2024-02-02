@@ -1,5 +1,4 @@
 import {
-  Link,
   ExternalLink,
   Youtube,
   Github,
@@ -8,6 +7,7 @@ import {
   CircleOff,
   RefreshCw,
 } from "lucide-react";
+import Link from "next/link";
 import { HTMLAttributes } from "react";
 
 export const DocumentationLink: React.FC<{
@@ -80,4 +80,9 @@ export const RefreshText: React.FC<{
 
 export const CodeSnippet: React.FC<HTMLAttributes<HTMLHeadingElement>> = (
   props,
-) => <code className="rounded-md bg-zinc-400 px-1 py-0.5" {...props} />;
+) => (
+  <code
+    className="rounded-md bg-zinc-400 px-1 py-0.5 dark:bg-zinc-700"
+    {...props}
+  />
+);

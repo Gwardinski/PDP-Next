@@ -18,7 +18,7 @@ export default async function RSCPage() {
         <PageDescription>
           <p>This page uses RSC so has already loaded.</p>
           <p>
-            Returns user data using the{" "}
+            Returns current user data using the{" "}
             <CodeSnippet>getServerSession()</CodeSnippet> method from{" "}
             <CodeSnippet>next-auth</CodeSnippet>
           </p>
