@@ -1,4 +1,9 @@
-import { PageHeader, PageLayout, PageTitle } from "@/components/page-layout";
+import {
+  PageDescription,
+  PageHeader,
+  PageLayout,
+  PageTitle,
+} from "@/components/page-layout";
 import { getServerSession } from "next-auth";
 
 export default async function Home() {
@@ -7,7 +12,13 @@ export default async function Home() {
   return (
     <PageLayout>
       <PageHeader>
-        <PageTitle>PDP Test Project</PageTitle>
+        <PageTitle>PDP Project</PageTitle>
+        <PageDescription>
+          <p>
+            A playground to work through various tutorials without having to
+            setup individual projects.
+          </p>
+        </PageDescription>
       </PageHeader>
     </PageLayout>
   );

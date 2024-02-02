@@ -1,0 +1,70 @@
+import { ListPlus, MoreVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Question, Round } from "./page";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { UniqueIdentifier } from "@dnd-kit/core";
+
+export const QuestionItem: React.FC<{
+  question: Question;
+  rounds?: Round[];
+  onAddToRound?: (question: Question, rid: UniqueIdentifier) => void;
+}> = ({ question, rounds, onAddToRound }) => {
+  return (
+    <AccordionItem
+      value={question.id.toString()}
+      className="flex flex-col rounded-md bg-zinc-100 dark:bg-zinc-900"
+    >
+      <AccordionTrigger
+        hideIcon
+        className="flex min-h-[80px] items-center gap-2 rounded-md bg-white p-2 dark:bg-zinc-700"
+      >
+        <div className="flex w-full flex-col items-start justify-start">
+          <h4>{question.title}</h4>
+          <AccordionContent>
+            <h4 className="italic">{question.answer}</h4>
+          </AccordionContent>
+          <h4 className="flex gap-4 text-sm text-zinc-400 dark:text-zinc-300">
+            {question.points} Points
+          </h4>
+        </div>
+        <div className="ml-auto flex w-fit items-center justify-center gap-2">
+          {onAddToRound && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <ListPlus />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Add To Round</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {rounds?.map((round) => {
+                  return (
+                    <DropdownMenuItem
+                      key={round.id}
+                      onClick={() => onAddToRound(question, round.id)}
+                    >
+                      {round.title}
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+      </AccordionTrigger>
+    </AccordionItem>
+  );
+};

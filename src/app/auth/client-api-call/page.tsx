@@ -2,7 +2,8 @@
 
 import {
   DataContainer,
-  DescriptionContainer,
+  PageDescription,
+  PageHeader,
   PageLayout,
   PageTitle,
 } from "@/components/page-layout";
@@ -19,19 +20,21 @@ export default function ClientAPICallPage() {
 
   return (
     <PageLayout>
-      <PageTitle>Client Component - API Call</PageTitle>
+      <PageHeader>
+        <PageTitle>Client Component - API Call</PageTitle>
 
-      <DescriptionContainer>
-        <p>
-          This page uses <code>{'"use client"'}</code>
-        </p>
-        <p>
-          Returns user data via a <code>fetch()</code> request to a Next API
-          route. Fetch request is wrapped with <code>useEffect</code> and the
-          data is stored with <code>useState</code>
-        </p>
-        <p className="italic">Notice the flash as the data loads in</p>
-      </DescriptionContainer>
+        <PageDescription>
+          <p>
+            This page uses <code>{'"use client"'}</code>
+          </p>
+          <p>
+            Returns user data via a <code>fetch()</code> request to a Next API
+            route. Fetch request is wrapped with <code>useEffect</code> and the
+            data is stored with <code>useState</code>
+          </p>
+          <p className="italic">Notice the flash as the data loads in</p>
+        </PageDescription>
+      </PageHeader>
 
       <DataContainer>
         <h4>Data:</h4>

@@ -1,7 +1,12 @@
 "use client";
 
 import { v4 as uuidv4 } from "uuid";
-import { PageLayout, PageHeader, PageTitle } from "@/components/page-layout";
+import {
+  PageLayout,
+  PageHeader,
+  PageTitle,
+  PageDescription,
+} from "@/components/page-layout";
 import {
   DndContext,
   DragEndEvent,
@@ -24,11 +29,16 @@ import {
 import { useState } from "react";
 import { Accordion } from "@/components/ui/accordion";
 import { CreateRoundModal, RoundCreate } from "./_createRound";
-import { RoundNested } from "./_roundNested";
+import { RoundDragOverlay, RoundItemNested } from "./_roundItemNested";
 import { QuestionCreate } from "./_createQuestion";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
-import { QuestionDragOverlay } from "./_questionNested";
+import { QuestionDragOverlay, QuestionItemNested } from "./_questionItemNested";
+import { Button } from "@/components/ui/button";
+import { set } from "react-hook-form";
+import { QuestionItem } from "./_questionItem";
+import { RoundItem } from "./_roundItem";
+import { Input } from "@/components/ui/input";
 
 export type Round = {
   id: UniqueIdentifier;
@@ -37,21 +47,51 @@ export type Round = {
 };
 export type Question = {
   id: UniqueIdentifier;
-  rid: UniqueIdentifier;
+  rid: UniqueIdentifier | null;
   title: string;
   answer: string;
   points: number;
 };
 
 export default function QuizPage() {
-  const [rounds, setRounds] = useState<Round[]>(mockData);
+  // Open, Close, Reorder States
+  const [ordering, setOrdering] = useState<boolean>(false);
+  const [openRounds, setOpenRounds] = useState<string[]>([]);
+  const [savedOpenRounds, setSavedOpenRounds] = useState<string[]>([]);
 
+  // Data States
+  const [rounds, setRounds] = useState<Round[]>(mockData);
+  // Flat Questions array from all Rounds
+  // Getting sorting to work when using Questions as a nested field with Rounds is a total cunt to work with
   const [questions, setQuestions] = useState<Question[]>(
     mockData.flatMap((r) => r.questions),
   );
+  const [libraryRounds, setLibraryRounds] =
+    useState<Round[]>(mockLibraryRounds);
+  const [libraryQuestions, setLibraryQuestions] =
+    useState<Question[]>(mockLibraryQuestions);
 
+  // DnD States
   const [activeQuestion, setActiveQuestion] = useState<Question | null>(null);
   const [activeRound, setActiveRound] = useState<Round | null>(null);
+
+  // UI Handlers
+  const onRoundOpened = (rids: string[]) => {
+    if (ordering) {
+      return;
+    }
+    setOpenRounds(rids);
+    setSavedOpenRounds(rids);
+  };
+
+  const onClickOrdering = (toggle: boolean) => {
+    if (toggle) {
+      setOpenRounds(savedOpenRounds);
+    } else {
+      setOpenRounds([]);
+    }
+    setOrdering(!toggle);
+  };
 
   // Mutate Handlers - Move into Context / Zustand
   const onCreateRound = (values: RoundCreate) => {
@@ -61,6 +101,12 @@ export default function QuizPage() {
       questions: [],
     };
     setRounds([...rounds, newRound]);
+  };
+
+  const onAddRoundToQuiz = (round: Round) => {
+    setRounds([...rounds, round]);
+    setQuestions([...questions, ...round.questions]);
+    setLibraryRounds(libraryRounds.filter((r) => r.id !== round.id));
   };
 
   const onDeleteRound = (rid: UniqueIdentifier) => {
@@ -75,6 +121,7 @@ export default function QuizPage() {
       answer: values.answer,
       points: values.points,
     };
+    setQuestions([...questions, newQuestion]);
     setRounds(
       rounds.map((r) => {
         if (r.id === rid) {
@@ -85,10 +132,25 @@ export default function QuizPage() {
     );
   };
 
+  const onAddQuestionToRound = (question: Question, rid: UniqueIdentifier) => {
+    question.rid = rid;
+    setLibraryQuestions(libraryQuestions.filter((q) => q.id !== question.id));
+    setQuestions([...questions, question]);
+    setRounds(
+      rounds.map((r) => {
+        if (r.id === rid) {
+          r.questions = [...r.questions, question];
+        }
+        return r;
+      }),
+    );
+  };
+
   const onDeleteQuestion = (
     questionId: UniqueIdentifier,
     rid: UniqueIdentifier,
   ) => {
+    setQuestions(questions.filter((q) => q.id !== questionId));
     setRounds(
       rounds.map((r) => {
         if (r.id === rid) {
@@ -128,17 +190,19 @@ export default function QuizPage() {
     setActiveQuestion(null);
 
     const { active, over } = event;
-    if (!over) return;
+    if (!over) {
+      return;
+    }
 
     const activeId = active.id;
     const overId = over.id;
+    if (activeId === overId) {
+      return;
+    }
 
-    if (activeId === overId) return;
-
-    const isActiveARound = active.data.current?.type === "ROUND";
-    if (!isActiveARound) return;
-
-    console.log("DRAG END");
+    if (active.data.current?.type !== "ROUND") {
+      return;
+    }
 
     setRounds((rounds) => {
       const activeRoundIndex = rounds.findIndex((r) => r.id === activeId);
@@ -151,26 +215,28 @@ export default function QuizPage() {
 
   function onDragOver(event: DragOverEvent) {
     const { active, over } = event;
-    if (!over) return;
+    if (!over) {
+      return;
+    }
 
     const activeId = active.id;
     const overId = over.id;
-
-    if (activeId === overId) return;
+    if (activeId === overId) {
+      return;
+    }
 
     const isActiveAQuestion = active.data.current?.type === "QUESTION";
-    const isOverAQuestion = over.data.current?.type === "QUESTION";
+    if (!isActiveAQuestion) {
+      return;
+    }
 
-    if (!isActiveAQuestion) return;
-
-    // Im dropping a Question over another Question
-    if (isActiveAQuestion && isOverAQuestion) {
+    // Dropping Question over another Question
+    if (over.data.current?.type === "QUESTION") {
       setQuestions((questions) => {
         const activeIndex = questions.findIndex((q) => q.id === activeId);
         const overIndex = questions.findIndex((q) => q.id === overId);
 
         if (questions[activeIndex].rid != questions[overIndex].rid) {
-          // Fix introduced after video recording
           questions[activeIndex].rid = questions[overIndex].rid;
           return arrayMove(questions, activeIndex, overIndex - 1);
         }
@@ -179,39 +245,56 @@ export default function QuizPage() {
       });
     }
 
-    const isOverARound = over.data.current?.type === "ROUND";
+    // Dropping a Question over a Round
+    if (over.data.current?.type === "ROUND") {
+      setOpenRounds([...openRounds, overId.toString()]);
+      setQuestions((qs) => {
+        const activeIndex = qs.findIndex((t) => t.id === activeId);
 
-    // Im dropping a Question over a round
-    if (isActiveAQuestion && isOverARound) {
-      setQuestions((questions) => {
-        const activeIndex = questions.findIndex((t) => t.id === activeId);
+        if (!activeIndex || activeIndex < 0) {
+          return qs;
+        }
 
-        questions[activeIndex].rid = overId;
+        qs[activeIndex].rid = overId;
 
-        return arrayMove(questions, activeIndex, activeIndex);
+        return arrayMove(qs, activeIndex, activeIndex);
       });
     }
+
+    // Update Rounds array which is primary state
+    setRounds((rs) => {
+      return rs.map((r) => {
+        r.questions = questions.filter((q) => q.rid === r.id);
+        return r;
+      });
+    });
   }
 
   return (
     <PageLayout>
       <PageHeader>
         <PageTitle>{"Quiz 'Trello' Board"}</PageTitle>
-        <p>
-          {
-            "Using 'dnd kit' to create a drag & drop interface for creating a Quiz"
-          }
-        </p>
-        <Link
-          href="https://dndkit.com/"
-          className="questions-center flex gap-2 hover:underline"
-        >
-          <ExternalLink /> Documentation
-        </Link>
+        <PageDescription>
+          <p>
+            Using dnd kit to create a drag & drop interface for creating a Quiz
+          </p>
+          <Link
+            href="https://dndkit.com/"
+            className="questions-center flex w-fit gap-2 hover:underline"
+          >
+            <ExternalLink /> DnD Kit Docs
+          </Link>
+          <p>Adding, Removing, and Ordering all work as expected ✅</p>
+          <p>
+            Search functionality is non-functional and just for example purposes
+            🛠️
+          </p>
+          <p>Refresh page to reset data 🔄</p>
+        </PageDescription>
       </PageHeader>
 
-      <div className="">
-        <div className="flex h-full max-w-xl flex-col gap-8 rounded-md bg-zinc-300 p-4">
+      <div className="flex w-full flex-col gap-8 lg:flex-row ">
+        <div className="flex h-full w-full max-w-xl flex-col gap-4 rounded-md bg-zinc-300 p-4 dark:bg-zinc-800">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCorners}
@@ -219,14 +302,27 @@ export default function QuizPage() {
             onDragOver={onDragOver}
             onDragEnd={onDragEnd}
           >
+            <Button
+              onClick={() => onClickOrdering(ordering)}
+              variant="outline"
+              className="ml-auto w-fit"
+            >
+              {ordering ? "Done" : "Reorder Rounds"}
+            </Button>
+
             <SortableContext
               items={rounds.map((r) => r.id)}
               strategy={verticalListSortingStrategy}
             >
-              <Accordion type="multiple" className="flex flex-col gap-4">
+              <Accordion
+                type="multiple"
+                value={openRounds}
+                onValueChange={onRoundOpened}
+                className="flex flex-col gap-4"
+              >
                 {rounds.map((r, i) => {
                   return (
-                    <RoundNested
+                    <RoundItemNested
                       key={`${r.id}-${i}`}
                       round={r}
                       questions={questions.filter((q) => q.rid === r.id)}
@@ -234,6 +330,7 @@ export default function QuizPage() {
                       onDeleteRound={onDeleteRound}
                       onCreateQuestion={onCreateQuestion}
                       onDeleteQuestion={onDeleteQuestion}
+                      ordering={ordering}
                     />
                   );
                 })}
@@ -243,11 +340,51 @@ export default function QuizPage() {
               {activeQuestion && (
                 <QuestionDragOverlay question={activeQuestion} />
               )}
-              {activeRound && <div className="h-20 w-full bg-zinc-600" />}
+              {activeRound && <RoundDragOverlay round={activeRound} />}
             </DragOverlay>
-          </DndContext>
 
-          <CreateRoundModal onCreateRound={onCreateRound} />
+            <CreateRoundModal onCreateRound={onCreateRound} />
+          </DndContext>
+        </div>
+
+        <div className="flex w-full max-w-xl flex-col gap-4">
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:gap-8">
+            <div className="flex min-w-fit flex-col">
+              <h2 className="min-w-fit text-xl">Add Questions</h2>
+              <h4 className="min-w-fit text-xs">Showing 4 of 20</h4>
+            </div>
+            <Input placeholder="Search your Library..." />
+          </div>
+          <Accordion type="multiple">
+            <div className="flex flex-col gap-2">
+              {libraryQuestions.map((q, i) => (
+                <QuestionItem
+                  key={q.id}
+                  question={q}
+                  rounds={rounds}
+                  onAddToRound={onAddQuestionToRound}
+                />
+              ))}
+            </div>
+          </Accordion>
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:gap-8">
+            <div className="flex h-full min-w-fit flex-col">
+              <h2 className="min-w-fit text-xl">Add Rounds</h2>
+              <h4 className="min-w-fit text-xs">Showing 2 of 2</h4>
+            </div>
+            <Input placeholder="Search your Library..." />
+          </div>
+          <Accordion type="multiple">
+            <div className="flex flex-col gap-2">
+              {libraryRounds.map((r) => (
+                <RoundItem
+                  key={r.id}
+                  round={r}
+                  onAddToQuiz={onAddRoundToQuiz}
+                />
+              ))}
+            </div>
+          </Accordion>
         </div>
       </div>
     </PageLayout>
@@ -260,6 +397,20 @@ const q1Id = `QUESTION-${uuidv4()}`;
 const q2Id = `QUESTION-${uuidv4()}`;
 const q3Id = `QUESTION-${uuidv4()}`;
 const q4Id = `QUESTION-${uuidv4()}`;
+const q5Id = `QUESTION-${uuidv4()}`;
+
+const q1lId = `QUESTION-${uuidv4()}`;
+const q2lId = `QUESTION-${uuidv4()}`;
+const q3lId = `QUESTION-${uuidv4()}`;
+const q4lId = `QUESTION-${uuidv4()}`;
+
+const r1lId = `ROUND-${uuidv4()}`;
+const r2lId = `ROUND-${uuidv4()}`;
+const q1lrId = `QUESTION-${uuidv4()}`;
+const q2lrId = `QUESTION-${uuidv4()}`;
+const q3lrId = `QUESTION-${uuidv4()}`;
+const q4lrId = `QUESTION-${uuidv4()}`;
+
 const mockData: Round[] = [
   {
     id: r1Id,
@@ -268,37 +419,118 @@ const mockData: Round[] = [
       {
         id: q1Id,
         rid: r1Id,
-        title: "Q1",
-        answer: "A1",
+        title: "What is the capital of Scotland",
+        answer: "Edinburgh",
         points: 1,
       },
       {
         id: q2Id,
         rid: r1Id,
-        title: "Q2",
-        answer: "A2",
+        title: "What name is commonly given to our moon",
+        answer: "Luna",
         points: 1,
       },
     ],
   },
   {
     id: r2Id,
-    title: "Sports",
+    title: "Heavy Metal",
     questions: [
       {
         id: q3Id,
         rid: r2Id,
-        title: "Q3",
-        answer: "A3",
+        title: "What is Ozzy Osbourne's real name",
+        answer: "John Michael Osbourne",
         points: 1,
       },
       {
         id: q4Id,
         rid: r2Id,
-        title: "Q4",
-        answer: "A4",
+        title: "Glasgows greatest metal band",
+        answer: "Bleed From Within",
+        points: 1,
+      },
+      {
+        id: q5Id,
+        rid: r2Id,
+        title: "Who plays drums for both Bleed from Within and Sylosis",
+        answer: "Ali Richardson",
         points: 1,
       },
     ],
+  },
+];
+
+const mockLibraryRounds: Round[] = [
+  {
+    id: r1lId,
+    title: "Geography",
+    questions: [
+      {
+        id: q1lrId,
+        rid: r1lId,
+        title: "What is the capital of France",
+        answer: "Paris",
+        points: 1,
+      },
+      {
+        id: q2lrId,
+        rid: r1lId,
+        title: "What is the capital of England",
+        answer: "London",
+        points: 1,
+      },
+    ],
+  },
+  {
+    id: r2lId,
+    title: "Sports",
+    questions: [
+      {
+        id: q3lrId,
+        rid: r2lId,
+        title: "Which country has won every single World Series",
+        answer: "USA",
+        points: 1,
+      },
+      {
+        id: q4lrId,
+        rid: r2lId,
+        title: "Something about Tennis",
+        answer: "14 Love",
+        points: 1,
+      },
+    ],
+  },
+];
+
+const mockLibraryQuestions: Question[] = [
+  {
+    id: q1lId,
+    rid: null,
+    title: "Who is the CEO of Apple",
+    answer: "Tim Cook",
+    points: 1,
+  },
+  {
+    id: q2lId,
+    rid: null,
+    title: "What year was the Battle of Hastings",
+    answer: "1066",
+    points: 1,
+  },
+  {
+    id: q3lId,
+    rid: null,
+    title: "Which Pokemon is number 1 in the Pokedex",
+    answer: "Bulbasaur",
+    points: 1,
+  },
+  {
+    id: q4lId,
+    rid: null,
+    title: "Which Pokemon is number 100 in the Pokedex",
+    answer: "Voltorb",
+    points: 1,
   },
 ];

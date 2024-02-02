@@ -13,14 +13,16 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Question, Round } from "./page";
-import { QuestionNested } from "./_questionNested";
+import { QuestionItemNested } from "./_questionItemNested";
 import { CreateQuestion, QuestionCreate } from "./_createQuestion";
 import { useMemo } from "react";
+import { Button } from "@/components/ui/button";
 
-export const RoundNested: React.FC<{
+export const RoundItemNested: React.FC<{
   round: Round;
   questions: Question[];
   index: number;
+  ordering: boolean;
   onDeleteRound: (rid: UniqueIdentifier) => void;
   onCreateQuestion: (q: QuestionCreate, rid: UniqueIdentifier) => void;
   onDeleteQuestion: (qid: UniqueIdentifier, rid: UniqueIdentifier) => void;
@@ -28,6 +30,7 @@ export const RoundNested: React.FC<{
   round,
   questions,
   index,
+  ordering,
   onDeleteRound,
   onCreateQuestion,
   onDeleteQuestion,
@@ -46,6 +49,7 @@ export const RoundNested: React.FC<{
     isDragging,
   } = useSortable({
     id: round.id,
+    disabled: !ordering,
     data: {
       type: "ROUND",
       round: round,
@@ -59,29 +63,35 @@ export const RoundNested: React.FC<{
 
   return (
     <AccordionItem
-      value={`ROUND-${round.id}`}
+      value={round.id.toString()}
       ref={setNodeRef}
       style={style}
-      className={`flex max-w-xl flex-col rounded-md bg-zinc-100 dark:bg-zinc-800 ${
+      className={`flex max-w-xl flex-col rounded-md bg-zinc-100 dark:bg-zinc-900 ${
         isDragging && "opacity-40"
       }`}
     >
-      <AccordionTrigger className="flex h-20 items-center gap-2 rounded-t-md bg-white p-2 dark:bg-zinc-700">
+      <AccordionTrigger
+        disabled={ordering}
+        className="flex h-20 items-center gap-2 rounded-t-md bg-white p-2 dark:bg-zinc-700"
+      >
         <div className="flex w-full flex-col items-start justify-start">
           <h4 className="flex gap-4 text-sm text-orange-500 dark:text-orange-600">
             Round {index + 1}
           </h4>
           <h2 className="text-lg">{round.title}</h2>
-          <h4 className="flex gap-4 text-sm text-zinc-200 dark:text-zinc-300">
+          <h4 className="flex gap-4 text-sm text-zinc-400 dark:text-zinc-300">
             {questions.length} Questions {totalPoints} Points
           </h4>
         </div>
-        <div className="ml-auto flex items-center justify-center gap-4">
-          <XCircle
+        <div className="ml-auto flex w-fit items-center justify-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => onDeleteRound(round.id)}
-            className="text-red-500 dark:text-red-700"
-          />
-          <GripVertical {...attributes} {...listeners} />
+          >
+            <XCircle className="text-red-500 dark:text-red-700" />
+          </Button>
+          {ordering && <GripVertical {...attributes} {...listeners} />}
         </div>
       </AccordionTrigger>
       <AccordionContent>
@@ -96,7 +106,7 @@ export const RoundNested: React.FC<{
         >
           <Accordion type="multiple" className="flex flex-col">
             {questions.map((question, i) => (
-              <QuestionNested
+              <QuestionItemNested
                 key={question.id}
                 question={question}
                 onDeleteQuestion={onDeleteQuestion}
@@ -112,5 +122,21 @@ export const RoundNested: React.FC<{
         </div>
       </AccordionContent>
     </AccordionItem>
+  );
+};
+
+export const RoundDragOverlay: React.FC<{ round: Round }> = ({ round }) => {
+  return (
+    <div
+      className={`flex h-20 w-full items-center rounded-md bg-white p-2 dark:bg-zinc-500`}
+    >
+      <div className="flex h-full w-full flex-col items-start justify-start">
+        <h4 className="flex gap-4 text-sm text-orange-500 dark:text-orange-600">
+          Round
+        </h4>
+        <h2 className="text-lg">{round.title}</h2>
+      </div>
+      <GripVertical />
+    </div>
   );
 };

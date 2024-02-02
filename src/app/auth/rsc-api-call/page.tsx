@@ -1,6 +1,7 @@
 import {
   DataContainer,
-  DescriptionContainer,
+  PageDescription,
+  PageHeader,
   PageLayout,
   PageTitle,
 } from "@/components/page-layout";
@@ -14,16 +15,18 @@ export default async function RSCAPICallPage() {
 
   return (
     <PageLayout>
-      <PageTitle>React Server Component - API Call</PageTitle>
+      <PageHeader>
+        <PageTitle>RSC - API Call</PageTitle>
 
-      <DescriptionContainer>
-        <p>This page uses RSC so has already loaded.</p>
-        <p>
-          Returns user data via a <code>fetch()</code> request to a Next API
-          route
-        </p>
-        <p>Notice no flash as the data has already been pre-loaded</p>
-      </DescriptionContainer>
+        <PageDescription>
+          <p>This page uses RSC so has already loaded.</p>
+          <p>
+            Returns user data via a <code>fetch()</code> request to a Next API
+            route
+          </p>
+          <p>Notice no flash as the data has already been pre-loaded</p>
+        </PageDescription>
+      </PageHeader>
 
       <DataContainer>
         <h4>Data:</h4>

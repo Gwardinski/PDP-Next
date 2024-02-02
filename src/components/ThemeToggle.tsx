@@ -13,7 +13,9 @@ export function ThemeToggle() {
       setTheme("dark");
     }
     if (theme === "dark") {
-      setTheme("system");
+      // Disable System for development, too lazy to click twice when toggling
+      // setTheme("system");
+      setTheme("light");
     }
     if (theme === "system") {
       setTheme("light");
