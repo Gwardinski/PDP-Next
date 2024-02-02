@@ -37,6 +37,10 @@ export default function AuthLayout({
                 NextAuth with Server Side Rendering
               </AccordionTrigger>
               <AccordionContent className="flex flex-col gap-2 pb-6">
+                <GithubLink
+                  text="Source Code"
+                  href="https://github.com/Gwardinski/PDP/tree/main/src/app/auth"
+                />
                 <DocumentationLink
                   href="https://next-auth.js.org/"
                   text="NextAuth Docs"
@@ -44,10 +48,6 @@ export default function AuthLayout({
                 <VideoLink
                   href="https://www.youtube.com/watch?v=md65iBX5Gxg"
                   text="Youtube Tutorial"
-                />
-                <GithubLink
-                  text="Source Code"
-                  href="https://github.com/Gwardinski/PDP/tree/main/src/app/auth"
                 />
                 <FunctionalText text="Each route gets user data" />
                 <BugText text="'RSC - Server Action' current goosed on Prod. Only works locally" />

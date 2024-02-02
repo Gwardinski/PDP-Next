@@ -1,12 +1,8 @@
 import {
-  Delete,
   Edit,
   GripVertical,
   ListPlus,
-  LucideMenu,
-  Menu,
   MoreHorizontal,
-  MoreVertical,
   Send,
   Trash,
   UserSquare,
@@ -25,7 +21,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Question, Round } from "./page";
 import { QuestionItemNested } from "./_questionItemNested";
 import { CreateQuestion, QuestionCreate } from "./_createQuestion";
 import { useMemo } from "react";
@@ -38,6 +33,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Question, Round } from "./_state";
 
 export const RoundItemNested: React.FC<{
   round: Round;
