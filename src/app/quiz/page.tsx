@@ -5,7 +5,7 @@ import {
   PageLayout,
   PageHeader,
   PageTitle,
-  PageDescription,
+  PageAccordionDescription,
 } from "@/components/page-layout";
 import {
   DndContext,
@@ -27,18 +27,40 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useState } from "react";
-import { Accordion } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { CreateRoundModal, RoundCreate } from "./_createRound";
 import { RoundDragOverlay, RoundItemNested } from "./_roundItemNested";
 import { QuestionCreate } from "./_createQuestion";
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import {
+  ArrowUpDown,
+  CheckCheck,
+  CheckCircle,
+  ExternalLink,
+  RefreshCw,
+  TicketCheck,
+  Wrench,
+} from "lucide-react";
 import { QuestionDragOverlay, QuestionItemNested } from "./_questionItemNested";
 import { Button } from "@/components/ui/button";
 import { set } from "react-hook-form";
 import { QuestionItem } from "./_questionItem";
 import { RoundItem } from "./_roundItem";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DocumentationLink,
+  VideoLink,
+  GithubLink,
+  FunctionalText,
+  NonFunctionalText,
+  RefreshText,
+} from "@/components/DocText";
 
 export type Round = {
   id: UniqueIdentifier;
@@ -54,43 +76,56 @@ export type Question = {
 };
 
 export default function QuizPage() {
-  // Open, Close, Reorder States
-  const [ordering, setOrdering] = useState<boolean>(false);
+  // UI States - Open, Close, Reorder
+  const [roundEditMode, setRoundEditMode] = useState<boolean>(false);
+  const [questionEditMode, setQuestionEditMode] = useState<boolean>(false);
   const [openRounds, setOpenRounds] = useState<string[]>([]);
   const [savedOpenRounds, setSavedOpenRounds] = useState<string[]>([]);
 
-  // Data States
-  const [rounds, setRounds] = useState<Round[]>(mockData);
-  // Flat Questions array from all Rounds
-  // Getting sorting to work when using Questions as a nested field with Rounds is a total cunt to work with
-  const [questions, setQuestions] = useState<Question[]>(
-    mockData.flatMap((r) => r.questions),
-  );
+  // Data States - Mocked API Response
   const [libraryRounds, setLibraryRounds] =
     useState<Round[]>(mockLibraryRounds);
   const [libraryQuestions, setLibraryQuestions] =
     useState<Question[]>(mockLibraryQuestions);
+  const [rounds, setRounds] = useState<Round[]>(mockData);
+  // Flatten Questions. Getting sorting to work with Questions as a nested field within Rounds is a total cunt to work with
+  const [questions, setQuestions] = useState<Question[]>(
+    mockData.flatMap((r) => r.questions),
+  );
 
-  // DnD States
+  // DnD States - Actively Dragged Items
   const [activeQuestion, setActiveQuestion] = useState<Question | null>(null);
   const [activeRound, setActiveRound] = useState<Round | null>(null);
 
   // UI Handlers
   const onRoundOpened = (rids: string[]) => {
-    if (ordering) {
+    if (roundEditMode) {
       return;
     }
     setOpenRounds(rids);
     setSavedOpenRounds(rids);
   };
 
-  const onClickOrdering = (toggle: boolean) => {
-    if (toggle) {
-      setOpenRounds(savedOpenRounds);
-    } else {
+  const onClickOrderRounds = () => {
+    const startEditing = roundEditMode === false;
+    if (startEditing) {
       setOpenRounds([]);
+    } else {
+      setOpenRounds(savedOpenRounds);
     }
-    setOrdering(!toggle);
+    setRoundEditMode(!roundEditMode);
+    setQuestionEditMode(false);
+  };
+
+  const onClickOrderQuestions = () => {
+    const startEditing = questionEditMode === false;
+    if (startEditing) {
+      setOpenRounds(rounds.map((r) => r.id.toString()));
+    } else {
+      setOpenRounds(savedOpenRounds);
+    }
+    setRoundEditMode(false);
+    setQuestionEditMode(!questionEditMode);
   };
 
   // Mutate Handlers - Move into Context / Zustand
@@ -274,117 +309,157 @@ export default function QuizPage() {
     <PageLayout>
       <PageHeader>
         <PageTitle>{"Quiz 'Trello' Board"}</PageTitle>
-        <PageDescription>
-          <p>
-            Using dnd kit to create a drag & drop interface for creating a Quiz
-          </p>
-          <Link
-            href="https://dndkit.com/"
-            className="questions-center flex w-fit gap-2 hover:underline"
-          >
-            <ExternalLink /> DnD Kit Docs
-          </Link>
-          <p>Adding, Removing, and Ordering all work as expected ✅</p>
-          <p>
-            Search functionality is non-functional and just for example purposes
-            🛠️
-          </p>
-          <p>Refresh page to reset data 🔄</p>
-        </PageDescription>
+        <PageAccordionDescription>
+          <Accordion type="single" collapsible defaultValue="description">
+            <AccordionItem value="description">
+              <AccordionTrigger className="gap-4">
+                Drag & Drop interface for creating a Quiz using DnD Kit
+              </AccordionTrigger>
+              <AccordionContent className="flex flex-col gap-2 pb-6">
+                <DocumentationLink
+                  href="https://dndkit.com/"
+                  text="DnD Kit Docs"
+                />
+                <VideoLink
+                  href="https://www.youtube.com/watch?v=RG-3R6Pu_Ik"
+                  text="Youtube Tutorial"
+                />
+                <GithubLink
+                  text="Source Code"
+                  href="https://github.com/Gwardinski/PDP/tree/main/src/app/quiz"
+                />
+                <FunctionalText text="Adding, Removing, and Ordering all work as expected" />
+                <NonFunctionalText
+                  text="Search functionality is non-functional and just for example
+                  purposes"
+                />
+                <NonFunctionalText
+                  text="Menu functionality - edit, publish delete is non-functional and just for example
+                  purposes"
+                />
+                <RefreshText text="Refresh page to reset data" />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </PageAccordionDescription>
       </PageHeader>
 
-      <div className="flex w-full flex-col gap-8 lg:flex-row ">
-        <div className="flex h-full w-full max-w-xl flex-col gap-4 rounded-md bg-zinc-300 p-4 dark:bg-zinc-800">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCorners}
-            onDragStart={onDragStart}
-            onDragOver={onDragOver}
-            onDragEnd={onDragEnd}
-          >
-            <Button
-              onClick={() => onClickOrdering(ordering)}
-              variant="outline"
-              className="ml-auto w-fit"
+      <div className="flex w-full flex-col gap-8 lg:flex-row">
+        <div className="flex h-full w-full max-w-xl flex-col gap-4">
+          <h2 className="text-xl">Rounds</h2>
+          <div className="flex h-full w-full flex-col gap-4 rounded-md bg-zinc-300 p-4 dark:border dark:border-zinc-800 dark:bg-transparent">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCorners}
+              onDragStart={onDragStart}
+              onDragOver={onDragOver}
+              onDragEnd={onDragEnd}
             >
-              {ordering ? "Done" : "Reorder Rounds"}
-            </Button>
+              <div className="flex w-fit items-center gap-2 self-end">
+                <Button
+                  onClick={onClickOrderRounds}
+                  variant="outline"
+                  className="ml-auto w-32"
+                >
+                  {roundEditMode ? "Done" : "Edit Rounds"}
+                </Button>
+                <Button
+                  onClick={onClickOrderQuestions}
+                  variant="outline"
+                  className="ml-auto w-32"
+                >
+                  {questionEditMode ? "Done" : "Edit Questions"}
+                </Button>
+                <ArrowUpDown className="size-4 text-zinc-600 dark:text-zinc-300" />
+              </div>
 
-            <SortableContext
-              items={rounds.map((r) => r.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <Accordion
-                type="multiple"
-                value={openRounds}
-                onValueChange={onRoundOpened}
-                className="flex flex-col gap-4"
+              <SortableContext
+                items={rounds.map((r) => r.id)}
+                strategy={verticalListSortingStrategy}
               >
-                {rounds.map((r, i) => {
-                  return (
-                    <RoundItemNested
-                      key={`${r.id}-${i}`}
-                      round={r}
-                      questions={questions.filter((q) => q.rid === r.id)}
-                      index={i}
-                      onDeleteRound={onDeleteRound}
-                      onCreateQuestion={onCreateQuestion}
-                      onDeleteQuestion={onDeleteQuestion}
-                      ordering={ordering}
-                    />
-                  );
-                })}
-              </Accordion>
-            </SortableContext>
-            <DragOverlay>
-              {activeQuestion && (
-                <QuestionDragOverlay question={activeQuestion} />
-              )}
-              {activeRound && <RoundDragOverlay round={activeRound} />}
-            </DragOverlay>
+                <Accordion
+                  type="multiple"
+                  value={openRounds}
+                  onValueChange={onRoundOpened}
+                  className="flex flex-col gap-4"
+                >
+                  {rounds.map((r, i) => {
+                    return (
+                      <RoundItemNested
+                        key={`${r.id}-${i}`}
+                        round={r}
+                        questions={questions.filter((q) => q.rid === r.id)}
+                        index={i}
+                        onDeleteRound={onDeleteRound}
+                        onCreateQuestion={onCreateQuestion}
+                        onDeleteQuestion={onDeleteQuestion}
+                        roundEditMode={roundEditMode}
+                        questionEditMode={questionEditMode}
+                      />
+                    );
+                  })}
+                </Accordion>
+              </SortableContext>
+              <DragOverlay>
+                {activeQuestion && (
+                  <QuestionDragOverlay question={activeQuestion} />
+                )}
+                {activeRound && <RoundDragOverlay round={activeRound} />}
+              </DragOverlay>
 
-            <CreateRoundModal onCreateRound={onCreateRound} />
-          </DndContext>
+              <CreateRoundModal onCreateRound={onCreateRound} />
+            </DndContext>
+          </div>
         </div>
 
-        <div className="flex w-full max-w-xl flex-col gap-4">
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:gap-8">
-            <div className="flex min-w-fit flex-col">
-              <h2 className="min-w-fit text-xl">Add Questions</h2>
-              <h4 className="min-w-fit text-xs">Showing 4 of 20</h4>
-            </div>
-            <Input placeholder="Search your Library..." />
-          </div>
-          <Accordion type="multiple">
-            <div className="flex flex-col gap-2">
-              {libraryQuestions.map((q, i) => (
-                <QuestionItem
-                  key={q.id}
-                  question={q}
-                  rounds={rounds}
-                  onAddToRound={onAddQuestionToRound}
-                />
-              ))}
-            </div>
-          </Accordion>
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:gap-8">
-            <div className="flex h-full min-w-fit flex-col">
-              <h2 className="min-w-fit text-xl">Add Rounds</h2>
-              <h4 className="min-w-fit text-xs">Showing 2 of 2</h4>
-            </div>
-            <Input placeholder="Search your Library..." />
-          </div>
-          <Accordion type="multiple">
-            <div className="flex flex-col gap-2">
-              {libraryRounds.map((r) => (
-                <RoundItem
-                  key={r.id}
-                  round={r}
-                  onAddToQuiz={onAddRoundToQuiz}
-                />
-              ))}
-            </div>
-          </Accordion>
+        <div className="flex h-full w-full max-w-xl flex-col gap-4 ">
+          <h2 className="text-xl">Add Content From Your Library</h2>
+          <Tabs defaultValue="library_questions">
+            <TabsList className="mb-2">
+              <TabsTrigger value="library_questions">Questions</TabsTrigger>
+              <TabsTrigger value="library_rounds">Rounds</TabsTrigger>
+            </TabsList>
+            <TabsContent value="library_questions">
+              <div className="flex flex-col gap-2">
+                <Input placeholder="Search your Questions..." />
+                <h4 className="min-w-fit self-end text-xs">
+                  Showing {libraryQuestions.length} of{" "}
+                  {mockLibraryQuestions.length}
+                </h4>
+                <Accordion type="multiple">
+                  <div className="flex flex-col gap-2">
+                    {libraryQuestions.map((q, i) => (
+                      <QuestionItem
+                        key={q.id}
+                        question={q}
+                        rounds={rounds}
+                        onAddToRound={onAddQuestionToRound}
+                      />
+                    ))}
+                  </div>
+                </Accordion>
+              </div>
+            </TabsContent>
+            <TabsContent value="library_rounds">
+              <div className="flex flex-col gap-2">
+                <Input placeholder="Search your Rounds..." />
+                <h4 className="min-w-fit self-end text-xs">
+                  Showing {libraryRounds.length} of {mockLibraryRounds.length}
+                </h4>
+                <Accordion type="multiple">
+                  <div className="flex flex-col gap-2">
+                    {libraryRounds.map((r) => (
+                      <RoundItem
+                        key={r.id}
+                        round={r}
+                        onAddToQuiz={onAddRoundToQuiz}
+                      />
+                    ))}
+                  </div>
+                </Accordion>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </PageLayout>

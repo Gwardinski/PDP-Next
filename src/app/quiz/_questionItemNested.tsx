@@ -4,19 +4,20 @@ import { Button } from "@/components/ui/button";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import {
-  Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Question } from "./page";
-import { useState } from "react";
 
 export const QuestionItemNested: React.FC<{
   question: Question;
   index: number;
+  questionEditMode: boolean;
   onDeleteQuestion?: (qid: UniqueIdentifier, rid: UniqueIdentifier) => void;
-}> = ({ question, index, onDeleteQuestion }) => {
+}> = ({ question, index, questionEditMode, onDeleteQuestion }) => {
+  const canEditQuestion = questionEditMode;
+
   const {
     setNodeRef,
     attributes,
@@ -25,6 +26,7 @@ export const QuestionItemNested: React.FC<{
     transition,
     isDragging,
   } = useSortable({
+    disabled: !canEditQuestion,
     id: question.id ?? 0,
     data: {
       type: "QUESTION",
@@ -42,13 +44,14 @@ export const QuestionItemNested: React.FC<{
       value={question.id.toString()}
       ref={setNodeRef}
       style={style}
-      className={`flex flex-col rounded-md bg-zinc-100 dark:bg-zinc-900 ${
+      className={`flex flex-col bg-zinc-100 dark:bg-zinc-900 ${
         isDragging && "opacity-40"
       }`}
     >
       <AccordionTrigger
+        disabled={canEditQuestion}
         hideIcon
-        className="flex min-h-[80px] items-center gap-2 rounded-t-md bg-white p-2 dark:bg-zinc-700"
+        className="flex min-h-[80px] items-center gap-2 p-2 "
       >
         <div className="flex w-full flex-col items-start justify-start">
           <h4 className="flex gap-4 text-sm text-orange-500 dark:text-orange-600">
@@ -62,18 +65,20 @@ export const QuestionItemNested: React.FC<{
             {question.points} Points
           </h4>
         </div>
-        <div className="ml-auto flex w-fit items-center justify-center gap-2">
-          {onDeleteQuestion && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDeleteQuestion(question.id, question.rid!)}
-            >
-              <XCircle className="text-red-500 dark:text-red-700" />
-            </Button>
-          )}
-          <GripVertical {...attributes} {...listeners} />
-        </div>
+        {canEditQuestion && (
+          <div className="ml-auto flex w-fit items-center justify-center gap-2">
+            {onDeleteQuestion && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onDeleteQuestion(question.id, question.rid!)}
+              >
+                <XCircle className="text-red-500 dark:text-red-700" />
+              </Button>
+            )}
+            <GripVertical {...attributes} {...listeners} />
+          </div>
+        )}
       </AccordionTrigger>
     </AccordionItem>
   );

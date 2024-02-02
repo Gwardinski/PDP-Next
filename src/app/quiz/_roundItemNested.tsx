@@ -1,4 +1,17 @@
-import { GripVertical, XCircle } from "lucide-react";
+import {
+  Delete,
+  Edit,
+  GripVertical,
+  ListPlus,
+  LucideMenu,
+  Menu,
+  MoreHorizontal,
+  MoreVertical,
+  Send,
+  Trash,
+  UserSquare,
+  XCircle,
+} from "lucide-react";
 import { CSS } from "@dnd-kit/utilities";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import {
@@ -17,12 +30,21 @@ import { QuestionItemNested } from "./_questionItemNested";
 import { CreateQuestion, QuestionCreate } from "./_createQuestion";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const RoundItemNested: React.FC<{
   round: Round;
   questions: Question[];
   index: number;
-  ordering: boolean;
+  roundEditMode: boolean;
+  questionEditMode: boolean;
   onDeleteRound: (rid: UniqueIdentifier) => void;
   onCreateQuestion: (q: QuestionCreate, rid: UniqueIdentifier) => void;
   onDeleteQuestion: (qid: UniqueIdentifier, rid: UniqueIdentifier) => void;
@@ -30,11 +52,16 @@ export const RoundItemNested: React.FC<{
   round,
   questions,
   index,
-  ordering,
+  roundEditMode,
+  questionEditMode,
   onDeleteRound,
   onCreateQuestion,
   onDeleteQuestion,
 }) => {
+  const canEditRound = useMemo(
+    () => roundEditMode && !questionEditMode,
+    [roundEditMode, questionEditMode],
+  );
   const questionIds = useMemo(() => questions.map((q) => q.id), [questions]);
   const totalPoints = useMemo(() => {
     return questions.reduce((acc, q) => acc + q.points, 0);
@@ -49,7 +76,7 @@ export const RoundItemNested: React.FC<{
     isDragging,
   } = useSortable({
     id: round.id,
-    disabled: !ordering,
+    disabled: !canEditRound,
     data: {
       type: "ROUND",
       round: round,
@@ -66,13 +93,13 @@ export const RoundItemNested: React.FC<{
       value={round.id.toString()}
       ref={setNodeRef}
       style={style}
-      className={`flex max-w-xl flex-col rounded-md bg-zinc-100 dark:bg-zinc-900 ${
+      className={`flex max-w-xl flex-col rounded-md bg-zinc-50 dark:bg-zinc-800 ${
         isDragging && "opacity-40"
       }`}
     >
       <AccordionTrigger
-        disabled={ordering}
-        className="flex h-20 items-center gap-2 rounded-t-md bg-white p-2 dark:bg-zinc-700"
+        disabled={canEditRound}
+        className="flex h-20 items-center gap-2 rounded-t-md p-2"
       >
         <div className="flex w-full flex-col items-start justify-start">
           <h4 className="flex gap-4 text-sm text-orange-500 dark:text-orange-600">
@@ -83,16 +110,18 @@ export const RoundItemNested: React.FC<{
             {questions.length} Questions {totalPoints} Points
           </h4>
         </div>
-        <div className="ml-auto flex w-fit items-center justify-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDeleteRound(round.id)}
-          >
-            <XCircle className="text-red-500 dark:text-red-700" />
-          </Button>
-          {ordering && <GripVertical {...attributes} {...listeners} />}
-        </div>
+        {canEditRound && (
+          <div className="ml-auto flex w-fit items-center justify-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDeleteRound(round.id)}
+            >
+              <XCircle className="text-red-500 dark:text-red-700" />
+            </Button>
+            <GripVertical {...attributes} {...listeners} />
+          </div>
+        )}
       </AccordionTrigger>
       <AccordionContent>
         {!questions.length && (
@@ -109,16 +138,48 @@ export const RoundItemNested: React.FC<{
               <QuestionItemNested
                 key={question.id}
                 question={question}
+                questionEditMode={questionEditMode}
                 onDeleteQuestion={onDeleteQuestion}
                 index={i}
               />
             ))}
           </Accordion>
         </SortableContext>
-        <div className="flex justify-end p-2">
+        <div className="flex justify-end gap-2 p-2">
           <CreateQuestion
             onCreateQuestion={(q) => onCreateQuestion(q, round.id)}
           />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <MoreHorizontal />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Round Options</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <ListPlus />
+                Add to Quiz
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Edit />
+                Edit Round
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Send />
+                Publish Round
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Trash />
+                Delete Round
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <UserSquare />
+                View Profile
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </AccordionContent>
     </AccordionItem>

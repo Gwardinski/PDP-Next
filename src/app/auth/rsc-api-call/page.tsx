@@ -1,8 +1,9 @@
+import { CodeSnippet } from "@/components/DocText";
 import {
   DataContainer,
   PageDescription,
-  PageHeader,
-  PageLayout,
+  PageNestedHeader,
+  PageNestedLayout,
   PageTitle,
 } from "@/components/page-layout";
 import { headers } from "next/headers";
@@ -14,24 +15,24 @@ export default async function RSCAPICallPage() {
   }).then((res) => res.json());
 
   return (
-    <PageLayout>
-      <PageHeader>
+    <PageNestedLayout>
+      <PageNestedHeader>
         <PageTitle>RSC - API Call</PageTitle>
 
         <PageDescription>
           <p>This page uses RSC so has already loaded.</p>
           <p>
-            Returns user data via a <code>fetch()</code> request to a Next API
-            route
+            Returns user data via a <CodeSnippet>fetch()</CodeSnippet> request
+            to a Next API route
           </p>
           <p>Notice no flash as the data has already been pre-loaded</p>
         </PageDescription>
-      </PageHeader>
+      </PageNestedHeader>
 
       <DataContainer>
         <h4>Data:</h4>
         {resp?.name}
       </DataContainer>
-    </PageLayout>
+    </PageNestedLayout>
   );
 }

@@ -9,6 +9,7 @@ import { Round } from "./page";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { QuestionItem } from "./_questionItem";
+import { QuestionItemNested } from "./_questionItemNested";
 
 export const RoundItem: React.FC<{
   round: Round;
@@ -21,9 +22,9 @@ export const RoundItem: React.FC<{
   return (
     <AccordionItem
       value={round.id.toString()}
-      className="flex max-w-xl flex-col rounded-md bg-zinc-100 dark:bg-zinc-900"
+      className="flex max-w-xl flex-col rounded-md bg-zinc-50 dark:bg-zinc-800"
     >
-      <AccordionTrigger className="flex h-20 items-center gap-2 rounded-t-md bg-white p-2 dark:bg-zinc-700">
+      <AccordionTrigger className="flex h-20 items-center gap-2 rounded-t-md p-2">
         <div className="flex w-full flex-col items-start justify-start">
           <h4 className="flex gap-4 text-sm text-orange-500 dark:text-orange-600">
             Round
@@ -51,7 +52,12 @@ export const RoundItem: React.FC<{
         )}
         <Accordion type="multiple" className="flex flex-col">
           {round.questions.map((question, i) => (
-            <QuestionItem key={question.id} question={question} />
+            <QuestionItemNested
+              key={question.id}
+              question={question}
+              index={i}
+              questionEditMode={false}
+            />
           ))}
         </Accordion>
       </AccordionContent>

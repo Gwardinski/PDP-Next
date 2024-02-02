@@ -9,7 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { ListPlus, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "./ui/button";
 
 export type AppRoute = {
@@ -19,7 +19,7 @@ export type AppRoute = {
 
 export const Navigation: React.FC = () => {
   return (
-    <header className="fixed flex h-12 w-full flex-row items-center justify-between gap-2 border-b border-zinc-300 bg-zinc-100 px-2 dark:border-zinc-700">
+    <header className="fixed flex h-12 w-full flex-row items-center justify-between gap-2 border-b border-zinc-300 bg-zinc-100 px-2 dark:border-zinc-700 dark:bg-zinc-900">
       <Link href={"/"}>
         <h2>PDP Project</h2>
       </Link>
@@ -81,10 +81,6 @@ const appRoutes: AppRoute[] = [
   {
     path: "/auth",
     name: "SSR NextAuth",
-  },
-  {
-    path: "/links",
-    name: "SSR Forms",
   },
   {
     path: "/quiz",

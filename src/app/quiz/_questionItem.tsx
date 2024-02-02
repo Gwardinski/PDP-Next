@@ -24,11 +24,11 @@ export const QuestionItem: React.FC<{
   return (
     <AccordionItem
       value={question.id.toString()}
-      className="flex flex-col rounded-md bg-zinc-100 dark:bg-zinc-900"
+      className="flex flex-col rounded-md bg-zinc-50 dark:bg-zinc-800"
     >
       <AccordionTrigger
         hideIcon
-        className="flex min-h-[80px] items-center gap-2 rounded-md bg-white p-2 dark:bg-zinc-700"
+        className="flex min-h-[80px] items-center gap-2 rounded-md p-2"
       >
         <div className="flex w-full flex-col items-start justify-start">
           <h4>{question.title}</h4>
