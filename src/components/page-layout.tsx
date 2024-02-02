@@ -36,7 +36,7 @@ export const PageAccordionDescription: React.FC<
   HTMLAttributes<HTMLHeadingElement>
 > = (props) => (
   <h1
-    className="flex min-w-fit max-w-lg flex-col gap-2 rounded-md bg-zinc-300 px-4 dark:bg-zinc-800"
+    className="flex min-w-fit max-w-lg flex-col gap-2 rounded-md bg-zinc-200 px-4 dark:bg-zinc-800 lg:min-w-full"
     {...props}
   />
 );
@@ -45,7 +45,7 @@ export const PageDescription: React.FC<HTMLAttributes<HTMLHeadingElement>> = (
   props,
 ) => (
   <h1
-    className="flex min-w-fit max-w-lg flex-col gap-2 rounded-md bg-zinc-300 p-4 pr-8 dark:bg-zinc-800 lg:pr-12"
+    className="flex min-w-fit max-w-lg flex-col gap-2 rounded-md bg-zinc-200 p-4 pr-8 dark:bg-zinc-800 lg:pr-12"
     {...props}
   />
 );

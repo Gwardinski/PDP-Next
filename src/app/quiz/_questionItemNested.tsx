@@ -8,7 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Question } from "./page";
+import { Question } from "./_state";
 
 export const QuestionItemNested: React.FC<{
   question: Question;
@@ -48,23 +48,25 @@ export const QuestionItemNested: React.FC<{
         isDragging && "opacity-40"
       }`}
     >
-      <AccordionTrigger
-        disabled={canEditQuestion}
-        hideIcon
-        className="flex min-h-[80px] items-center gap-2 p-2 "
-      >
-        <div className="flex w-full flex-col items-start justify-start">
-          <h4 className="flex gap-4 text-sm text-orange-500 dark:text-orange-600">
-            Question {index + 1}
-          </h4>
-          <h4>{question.title}</h4>
-          <AccordionContent>
-            <h4 className="italic">{question.answer}</h4>
-          </AccordionContent>
-          <h4 className="flex gap-4 text-sm text-zinc-400 dark:text-zinc-300">
-            {question.points} Points
-          </h4>
-        </div>
+      <div className="flex gap-2 p-2">
+        <AccordionTrigger
+          disabled={canEditQuestion}
+          hideIcon
+          className="flex min-h-[80px] items-center"
+        >
+          <div className="flex w-full flex-col items-start justify-start">
+            <h4 className="flex gap-4 text-sm text-orange-500 dark:text-orange-600">
+              Question {index + 1}
+            </h4>
+            <h4>{question.title}</h4>
+            <AccordionContent>
+              <h4 className="italic">{question.answer}</h4>
+            </AccordionContent>
+            <h4 className="flex gap-4 text-sm text-zinc-400 dark:text-zinc-300">
+              {question.points} Points
+            </h4>
+          </div>
+        </AccordionTrigger>
         {canEditQuestion && (
           <div className="ml-auto flex w-fit items-center justify-center gap-2">
             {onDeleteQuestion && (
@@ -79,7 +81,7 @@ export const QuestionItemNested: React.FC<{
             <GripVertical {...attributes} {...listeners} />
           </div>
         )}
-      </AccordionTrigger>
+      </div>
     </AccordionItem>
   );
 };

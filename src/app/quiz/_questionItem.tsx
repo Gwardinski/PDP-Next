@@ -1,11 +1,10 @@
-import { ListPlus, MoreVertical } from "lucide-react";
+import { ListPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Question, Round } from "./page";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UniqueIdentifier } from "@dnd-kit/core";
+import { Question, Round } from "./_state";
 
 export const QuestionItem: React.FC<{
   question: Question;

@@ -29,9 +29,9 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <body className="h-full min-h-screen overflow-x-hidden overflow-y-scroll bg-gradient-to-b from-zinc-100 to-zinc-200 dark:from-zinc-900 dark:to-zinc-950">
+          <body className="flex h-full min-h-screen flex-col overflow-x-hidden overflow-y-scroll bg-gradient-to-b from-zinc-100 to-zinc-200 dark:from-zinc-900 dark:to-zinc-950">
             <Navigation />
-            <main className="flex flex-col px-4 pt-12 lg:px-16">
+            <main className="flex w-full max-w-7xl flex-col self-center px-2 pt-12">
               {children}
             </main>
           </body>
