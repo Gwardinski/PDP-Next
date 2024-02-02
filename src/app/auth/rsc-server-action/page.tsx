@@ -1,13 +1,13 @@
 import { getServerSession } from "next-auth";
-
 import WhoAmIButton from "./WhoAmIButton";
 import {
   DataContainer,
   PageDescription,
-  PageHeader,
-  PageLayout,
+  PageNestedHeader,
+  PageNestedLayout,
   PageTitle,
 } from "@/components/page-layout";
+import { CodeSnippet } from "@/components/DocText";
 
 export default async function RSCServerActionPage() {
   const whoAmI = async (): Promise<string> => {
@@ -17,8 +17,8 @@ export default async function RSCServerActionPage() {
   };
 
   return (
-    <PageLayout>
-      <PageHeader>
+    <PageNestedLayout>
+      <PageNestedHeader>
         <PageTitle>RSC - Server Actions</PageTitle>
 
         <PageDescription>
@@ -26,18 +26,18 @@ export default async function RSCServerActionPage() {
           <p>
             Returns user data via a server action that is passed down as an
             onClick method to a child component marked with{" "}
-            <code>{'"use client"'}</code>
+            <CodeSnippet>{'"use client"'}</CodeSnippet>
           </p>
           <p>
             This allows the child to only call the data when required, and then
-            store the value using <code>useState</code>
+            store the value using <CodeSnippet>useState</CodeSnippet>
           </p>
         </PageDescription>
-      </PageHeader>
+      </PageNestedHeader>
 
       <DataContainer>
         <WhoAmIButton whoAmI={whoAmI} />
       </DataContainer>
-    </PageLayout>
+    </PageNestedLayout>
   );
 }

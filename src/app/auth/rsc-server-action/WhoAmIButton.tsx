@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 export default function WhoAmIButton({
@@ -10,15 +11,15 @@ export default function WhoAmIButton({
   const [name, setName] = useState<string>();
 
   return (
-    <div className="flex gap-2 items-center justify-between">
-      <button
-        className="border border-neutral-700 p-2 rounded-md w-fit"
+    <div className="flex flex-col items-center justify-between gap-4">
+      <Button
+        variant="outline"
         onClick={async () => {
           setName(await whoAmI());
         }}
       >
         Who Am I?
-      </button>
+      </Button>
       {name && <div>{name}</div>}
     </div>
   );

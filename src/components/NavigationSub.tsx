@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export const NavigationSub: React.FC<{ routes: AppRoute[] }> = ({ routes }) => {
   return (
-    <nav className="flex gap-8 overflow-x-auto overflow-y-hidden border-b border-zinc-300 dark:border-zinc-700 lg:self-center">
+    <nav className="no-scrollbar flex gap-8 overflow-x-auto overflow-y-hidden rounded-md border border-zinc-300  px-2 dark:border-zinc-700 lg:self-center">
       {routes.map(({ path, name }) => (
         <NavigationSubLink key={path} path={path} name={name} />
       ))}

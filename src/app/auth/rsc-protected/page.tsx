@@ -5,8 +5,11 @@ import {
   PageDescription,
   PageHeader,
   PageLayout,
+  PageNestedHeader,
+  PageNestedLayout,
   PageTitle,
 } from "@/components/page-layout";
+import { CodeSnippet } from "@/components/DocText";
 
 export default async function RSCProtectedPage() {
   const session = await getServerSession();
@@ -16,19 +19,20 @@ export default async function RSCProtectedPage() {
   }
 
   return (
-    <PageLayout>
-      <PageHeader>
+    <PageNestedLayout>
+      <PageNestedHeader>
         <PageTitle>React Server Component - Protected!</PageTitle>
 
         <PageDescription>
           <p>This page uses RSC so has already loaded.</p>
           <p>
-            Returns user data using the <code>getServerSession()</code> method
-            from <code>next-auth</code>
+            Returns user data using the{" "}
+            <CodeSnippet>getServerSession()</CodeSnippet> method from{" "}
+            <CodeSnippet>next-auth</CodeSnippet>
           </p>
           <p>Protected by a redirect when unauthenticated</p>
         </PageDescription>
-      </PageHeader>
+      </PageNestedHeader>
 
       <DataContainer>
         <p>Data:</p>
@@ -38,6 +42,6 @@ export default async function RSCProtectedPage() {
           <h4>This sentence will never be seen</h4>
         )}
       </DataContainer>
-    </PageLayout>
+    </PageNestedLayout>
   );
 }

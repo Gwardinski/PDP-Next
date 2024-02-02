@@ -1,8 +1,9 @@
+import { CodeSnippet } from "@/components/DocText";
 import {
   DataContainer,
   PageDescription,
-  PageHeader,
-  PageLayout,
+  PageNestedHeader,
+  PageNestedLayout,
   PageTitle,
 } from "@/components/page-layout";
 import { getServerSession } from "next-auth";
@@ -11,17 +12,18 @@ export default async function RSCPage() {
   const session = await getServerSession();
 
   return (
-    <PageLayout>
-      <PageHeader>
+    <PageNestedLayout>
+      <PageNestedHeader>
         <PageTitle>React Server Component (RSC)</PageTitle>
         <PageDescription>
           <p>This page uses RSC so has already loaded.</p>
           <p>
-            Returns user data using the <code>getServerSession()</code> method
-            from <code>next-auth</code>
+            Returns user data using the{" "}
+            <CodeSnippet>getServerSession()</CodeSnippet> method from{" "}
+            <CodeSnippet>next-auth</CodeSnippet>
           </p>
         </PageDescription>
-      </PageHeader>
+      </PageNestedHeader>
 
       <DataContainer>
         <p>Data:</p>
@@ -31,6 +33,6 @@ export default async function RSCPage() {
           <h4>Not logged in</h4>
         )}
       </DataContainer>
-    </PageLayout>
+    </PageNestedLayout>
   );
 }
