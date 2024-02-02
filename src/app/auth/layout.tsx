@@ -1,4 +1,5 @@
-import { AppRoute, Navigation } from "@/components/Navigation";
+import { AppRoute } from "@/components/Navigation";
+import { NavigationSub } from "@/components/NavigationSub";
 
 export default function AuthLayout({
   children,
@@ -7,7 +8,7 @@ export default function AuthLayout({
 }) {
   return (
     <>
-      <Navigation routes={AuthRoutes} />
+      <NavigationSub routes={AuthRoutes} />
       {children}
     </>
   );

@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import {
   DataContainer,
-  DescriptionContainer,
+  PageDescription,
+  PageHeader,
   PageLayout,
   PageTitle,
 } from "@/components/page-layout";
@@ -16,16 +17,18 @@ export default async function RSCProtectedPage() {
 
   return (
     <PageLayout>
-      <PageTitle>React Server Component - Protected!</PageTitle>
+      <PageHeader>
+        <PageTitle>React Server Component - Protected!</PageTitle>
 
-      <DescriptionContainer>
-        <p>This page uses RSC so has already loaded.</p>
-        <p>
-          Returns user data using the <code>getServerSession()</code> method
-          from <code>next-auth</code>
-        </p>
-        <p>Protected by a redirect when unauthenticated</p>
-      </DescriptionContainer>
+        <PageDescription>
+          <p>This page uses RSC so has already loaded.</p>
+          <p>
+            Returns user data using the <code>getServerSession()</code> method
+            from <code>next-auth</code>
+          </p>
+          <p>Protected by a redirect when unauthenticated</p>
+        </PageDescription>
+      </PageHeader>
 
       <DataContainer>
         <p>Data:</p>

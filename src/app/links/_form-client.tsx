@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import { useTransition } from "react";
 
 import { LinkFormType, linksFormRequest } from "./_form-server";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export const LinkForm: React.FC = () => {
   const [isPending, startTransition] = useTransition();
@@ -18,21 +20,17 @@ export const LinkForm: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-4 max-w-md justify-center items-center"
+      className="flex max-w-md flex-col items-center justify-center gap-4"
     >
-      <input
+      <Input
         type="text"
         placeholder="www.example.com"
-        className="w-full text-black h-10 text-lg rounded-md px-2"
+        className="h-10 w-full rounded-md px-2 text-lg text-black"
         {...register("link", { required: true })}
       />
-      <button
-        disabled={isPending}
-        type="submit"
-        className="border rounded-md h-10 w-40 text-lg hover:bg-neutral-800 active:bg-neutral-700"
-      >
+      <Button variant="outline-primary" disabled={isPending} type="submit">
         Shorten!
-      </button>
+      </Button>
     </form>
   );
 };

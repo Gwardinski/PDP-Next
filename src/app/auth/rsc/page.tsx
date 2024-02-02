@@ -1,6 +1,7 @@
 import {
   DataContainer,
-  DescriptionContainer,
+  PageDescription,
+  PageHeader,
   PageLayout,
   PageTitle,
 } from "@/components/page-layout";
@@ -11,15 +12,16 @@ export default async function RSCPage() {
 
   return (
     <PageLayout>
-      <PageTitle>React Server Component</PageTitle>
-
-      <DescriptionContainer>
-        <p>This page uses RSC so has already loaded.</p>
-        <p>
-          Returns user data using the <code>getServerSession()</code> method
-          from <code>next-auth</code>
-        </p>
-      </DescriptionContainer>
+      <PageHeader>
+        <PageTitle>React Server Component (RSC)</PageTitle>
+        <PageDescription>
+          <p>This page uses RSC so has already loaded.</p>
+          <p>
+            Returns user data using the <code>getServerSession()</code> method
+            from <code>next-auth</code>
+          </p>
+        </PageDescription>
+      </PageHeader>
 
       <DataContainer>
         <p>Data:</p>

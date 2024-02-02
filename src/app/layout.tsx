@@ -29,37 +29,14 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <body className="bg-gradient-to-b from-zinc-100 to-zinc-200 dark:to-zinc-950 dark:from-zinc-900 h-screen w-screen">
-            <header className="flex w-full justify-between items-center gap-2">
-              <Navigation routes={AppRoutes} />
-              <div className="flex gap-2">
-                <AuthButton />
-                <ThemeToggle />
-              </div>
-            </header>
-            <main className="px-4 lg:px-16">{children}</main>
+          <body className="h-full min-h-screen overflow-x-hidden bg-gradient-to-b from-zinc-100 to-zinc-200 dark:from-zinc-900 dark:to-zinc-950">
+            <Navigation />
+            <main className="flex flex-col px-4 pt-12 lg:px-16">
+              {children}
+            </main>
           </body>
         </ThemeProvider>
       </SessionProvider>
     </html>
   );
 }
-
-const AppRoutes: AppRoute[] = [
-  {
-    path: "/",
-    name: "Home",
-  },
-  {
-    path: "/auth",
-    name: "NextAuth with SSR",
-  },
-  {
-    path: "/links",
-    name: "Form Requests with SSR",
-  },
-  {
-    path: "/quiz",
-    name: "Quiz 'Trello' Board",
-  },
-];
