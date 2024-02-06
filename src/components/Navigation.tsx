@@ -22,7 +22,7 @@ export const Navigation: React.FC = () => {
     <header className="fixed flex h-12 w-full items-center justify-center border-b border-zinc-300 bg-zinc-100 px-2 dark:border-zinc-700 dark:bg-zinc-900">
       <div className="flex h-12 w-full max-w-7xl flex-row items-center justify-between gap-2">
         <Link href={"/"}>
-          <h2>PDP Project</h2>
+          <h2>PDP Playground</h2>
         </Link>
         <div className="hidden lg:flex">
           {appRoutes.map(({ path, name }) => (

@@ -1,17 +1,9 @@
-import {
-  CodeSnippet,
-  GithubLink,
-  DocumentationLink,
-  VideoLink,
-  FunctionalText,
-  NonFunctionalText,
-  RefreshText,
-  BugText,
-} from "@/components/DocText";
+import { GithubLink, DocumentationLink } from "@/components/DocText";
+import { YoutubeVideo, YoutubeVideoGrid } from "@/components/Youtube";
 import {
   PageAccordionDescription,
-  PageDescription,
   PageHeader,
+  PageHeading,
   PageLayout,
   PageTitle,
 } from "@/components/page-layout";
@@ -21,15 +13,40 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { getServerSession } from "next-auth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+const KEY = process.env.YOUTUBE_API_KEY;
+const PLAYLIST_ID_1 = process.env.YOUTUBE_PLAYLIST_ID_1;
+const PLAYLIST_ID_2 = process.env.YOUTUBE_PLAYLIST_ID_2;
+const YOUTUBE_PLAYLIST_ITEMS_API =
+  "https://www.googleapis.com/youtube/v3/playlistItems";
+
+async function getYoutubePlaylist(id: string): Promise<{
+  videos: YoutubeVideo[];
+}> {
+  try {
+    const res = await fetch(
+      `${YOUTUBE_PLAYLIST_ITEMS_API}?part=snippet&maxResults=50&playlistId=${id}&key=${KEY}`,
+    );
+    const data = await res.json();
+    const videos: YoutubeVideo[] =
+      data?.items.map((item: YoutubeVideo) => {
+        return item;
+      }) ?? [];
+    return { videos };
+  } catch {
+    return { videos: [] };
+  }
+}
 
 export default async function Home() {
-  const session = await getServerSession();
+  const { videos: playlist1 } = await getYoutubePlaylist(PLAYLIST_ID_1 ?? "");
+  const { videos: playlist2 } = await getYoutubePlaylist(PLAYLIST_ID_2 ?? "");
 
   return (
     <PageLayout>
       <PageHeader>
-        <PageTitle>PDP Project</PageTitle>
+        <PageTitle>PDP Playground</PageTitle>
         <PageAccordionDescription>
           <Accordion type="single" collapsible defaultValue="description">
             <AccordionItem value="description">
@@ -64,6 +81,25 @@ export default async function Home() {
           </Accordion>
         </PageAccordionDescription>
       </PageHeader>
+
+      <PageHeading>Tutorials</PageHeading>
+      <p>
+        {
+          "Interesting things I've added to playlists and may or may not get around to looking into 👀"
+        }
+      </p>
+      <Tabs defaultValue="1">
+        <TabsList>
+          <TabsTrigger value="1">Stuff to Code</TabsTrigger>
+          <TabsTrigger value="2">Stuff to Watch</TabsTrigger>
+        </TabsList>
+        <TabsContent value="1">
+          <YoutubeVideoGrid videos={playlist1} />
+        </TabsContent>
+        <TabsContent value="2">
+          <YoutubeVideoGrid videos={playlist2} />
+        </TabsContent>
+      </Tabs>
     </PageLayout>
   );
 }

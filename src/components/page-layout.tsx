@@ -32,6 +32,15 @@ export const PageTitle: React.FC<HTMLAttributes<HTMLHeadingElement>> = (
   />
 );
 
+export const PageHeading: React.FC<HTMLAttributes<HTMLHeadingElement>> = (
+  props,
+) => (
+  <h1
+    className="bg-gradient-to-b from-zinc-900 to-zinc-600 bg-clip-text text-3xl font-bold tracking-wide text-transparent dark:from-zinc-100 dark:to-zinc-400"
+    {...props}
+  />
+);
+
 export const PageAccordionDescription: React.FC<
   HTMLAttributes<HTMLHeadingElement>
 > = (props) => (

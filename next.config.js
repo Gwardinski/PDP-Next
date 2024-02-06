@@ -5,6 +5,14 @@ const nextConfig = {
       enabled: true,
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;

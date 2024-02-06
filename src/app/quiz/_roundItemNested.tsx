@@ -93,19 +93,21 @@ export const RoundItemNested: React.FC<{
         isDragging && "opacity-40"
       }`}
     >
-      <AccordionTrigger
-        disabled={canEditRound}
-        className="flex h-20 items-center gap-2 rounded-t-md p-2"
-      >
-        <div className="flex w-full flex-col items-start justify-start">
-          <h4 className="flex gap-4 text-sm text-orange-500 dark:text-orange-600">
-            Round {index + 1}
-          </h4>
-          <h2 className="text-lg">{round.title}</h2>
-          <h4 className="flex gap-4 text-sm text-zinc-400 dark:text-zinc-300">
-            {questions.length} Questions {totalPoints} Points
-          </h4>
-        </div>
+      <div className="flex gap-2 p-2">
+        <AccordionTrigger
+          disabled={canEditRound}
+          className="flex h-20 flex-1 items-center gap-2 rounded-t-md p-2"
+        >
+          <div className="flex w-full flex-col items-start justify-start">
+            <h4 className="flex gap-4 text-sm text-orange-500 dark:text-orange-600">
+              Round {index + 1}
+            </h4>
+            <h2 className="text-lg">{round.title}</h2>
+            <h4 className="flex gap-4 text-sm text-zinc-400 dark:text-zinc-300">
+              {questions.length} Questions {totalPoints} Points
+            </h4>
+          </div>
+        </AccordionTrigger>
         {canEditRound && (
           <div className="ml-auto flex w-fit items-center justify-center gap-2">
             <Button
@@ -118,7 +120,7 @@ export const RoundItemNested: React.FC<{
             <GripVertical {...attributes} {...listeners} />
           </div>
         )}
-      </AccordionTrigger>
+      </div>
       <AccordionContent>
         {!questions.length && (
           <div className="flex h-16 items-center justify-center">

@@ -50,7 +50,7 @@ export default function AuthLayout({
                   text="Youtube Tutorial"
                 />
                 <FunctionalText text="Each route gets user data" />
-                <BugText text="'RSC - Server Action' current goosed on Prod. Only works locally" />
+                <BugText text="'RSC - API Call' current goosed on Prod. Only works locally" />
               </AccordionContent>
             </AccordionItem>
           </Accordion>
