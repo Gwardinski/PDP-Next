@@ -35,6 +35,7 @@ async function getYoutubePlaylist(id: string): Promise<{
       }) ?? [];
     return { videos };
   } catch {
+    console.log("Failed to fetch youtube playlist: ", id);
     return { videos: [] };
   }
 }
